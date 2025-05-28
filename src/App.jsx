@@ -27,6 +27,16 @@ export default function App() {
     const [garnish, setGarnish] = useState(null);
     const [prepMethod, setPrepMethod] = useState(null);
     const [mission, setMission] = useState(() => getRandomMission());
+    
+    // Day/report state
+    const [day, setDay] = useState(1);
+    const [showReport, setShowReport] = useState(false);
+
+    // Move the useEffect after day state is initialized
+    useEffect(() => {
+        setMission(getRandomMission());
+    }, [day]);
+
     const [score, setScore] = useState(0);
     const [timeLeft, setTimeLeft] = useState(120);
     const [drinksServed, setDrinksServed] = useState(0);
@@ -35,19 +45,12 @@ export default function App() {
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [selectedCocktail, setSelectedCocktail] = useState(null);
 
-    // Day/report state
-    const [day, setDay] = useState(1);
-    const [showReport, setShowReport] = useState(false);
-
     const progressRef = useRef();
 
     // 3) Handler to receive money updates from GameProgress
-    // You had this part wrongly in main body, so let's create a callback:
-    const handleMoneyChange = useCallback(() => {
-        const { moneyEarned, totalCost } = getScoreData(drinksServed);
-        setMoney((prevMoney) => prevMoney + moneyEarned - totalCost);
-    }, [drinksServed]);
-
+    const handleMoneyChange = useCallback((amount) => {
+        setMoney(prevMoney => prevMoney + amount);
+    }, []);
 
     // Timer effect: countdown unless report is showing
     useEffect(() => {
@@ -94,18 +97,18 @@ export default function App() {
 
     // Serve the drink
     const handleServe = useCallback(() => {
-        const pts = evaluateDrink(mixGlass, mission);
+        const pts = evaluateDrink(mixGlass, mission, garnish, prepMethod);
         if (pts > 0) {
             alert(`✅ Served! +${pts} gold.`);
             setScore((s) => s + pts);
             setDrinksServed((n) => n + 1);
-            progressRef.current?.earnMoney(pts);
+            progressRef.current?.changeMoney(pts);
         } else {
             alert(`❌ Drink didn't meet requirements. No gold awarded.`);
         }
         resetMix();
         setMission(getRandomMission());
-    }, [mixGlass, mission, resetMix]);
+    }, [mixGlass, mission, garnish, prepMethod, resetMix]);
 
     // Finish Day early
     const handleFinishDay = useCallback(() => {
@@ -113,20 +116,21 @@ export default function App() {
     }, []);
 
     // Next Day: hide report, reset bar, increment day
-    const handleNextDay = useCallback(() => {
+    const handleNextDay = useCallback((newBalance) => {
         setShowReport(false);
         setDay((d) => d + 1);
         setTimeLeft(120);
         resetMix();
         setMission(getRandomMission());
         setDrinksServed(0);
+        setMoney(typeof newBalance === 'number' ? newBalance : 0);
     }, [resetMix]);
 
     // Upgrades & fridge from sidebar
     const handleUpgrade = useCallback((type) => console.log('Upgrade:', type), []);
 
     const handleUseFridge = useCallback(() => {
-        progressRef.current?.earnMoney();
+        progressRef.current?.changeMoney();
         resetMix();
         setMission(getRandomMission());
     }, [resetMix]);
@@ -166,6 +170,7 @@ export default function App() {
                         onUpgrade={handleUpgrade}
                         onUseFridge={handleUseFridge}
                         onMoneyChange={handleMoneyChange}
+                        totalMoney={money}
                     />
                 </aside>
 
@@ -330,7 +335,12 @@ export default function App() {
             </div>
 
             {/* End-of-day report modal */}
-            {showReport && <FinanceReport day={day} drinksServed={drinksServed} onNextDay={handleNextDay} />}
+            {showReport && <FinanceReport 
+                day={day} 
+                drinksServed={drinksServed} 
+                currentMoney={money}
+                onNextDay={handleNextDay} 
+            />}
         </div>
     );
 }

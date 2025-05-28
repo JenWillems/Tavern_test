@@ -1,9 +1,20 @@
-// FinanceReport.jsx
+// FinanceReport.jsx - Daily financial summary modal
 import React from 'react';
 import GameOverScreen from './GameOverScreen.jsx';
 import { getScoreData } from './GameLogic.js';
 
+/**
+ * Daily financial report modal component
+ * Shows earnings, expenses, and balance changes at the end of each day
+ * 
+ * @param {Object} props Component properties
+ * @param {number} props.day Current day number
+ * @param {number} props.drinksServed Number of drinks served today
+ * @param {number} props.currentMoney Current money before calculations
+ * @param {Function} props.onNextDay Callback for proceeding to next day
+ */
 export default function FinanceReport({ day, drinksServed, currentMoney, onNextDay }) {
+    // Calculate all financial data for the day
     const {
         moneyEarned,
         rentCost,
@@ -29,13 +40,14 @@ export default function FinanceReport({ day, drinksServed, currentMoney, onNextD
             <GameOverScreen
                 day={day}
                 moneyEarned={moneyEarned}
-                rent={rentCost}
-                booze={boozeCost}
-                food={foodCost}
-                totalCost={totalCost}
+                rent={-rentCost}
+                booze={-boozeCost}
+                food={-foodCost}
+                totalCost={-totalCost}
                 net={net}
-                newBalance={newBalance}  // Pass it here if you want to display it
-                onNextDay={() => onNextDay(newBalance)} // Pass the new balance on next day
+                currentMoney={currentMoney}
+                newBalance={newBalance}
+                onNextDay={onNextDay}
             />
         </div>
     );

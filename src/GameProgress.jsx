@@ -31,16 +31,10 @@ const showUpgradeAlerts = (unlocked, type) => {
     window.alert(`ℹ️ ${upgradeInfo[type]}`);
 };
 
-const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange }, ref) => {
-    const [money, setMoney] = useState(0);
+const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange, totalMoney }, ref) => {
     const [round, setRound] = useState(1);
     const [upgrades, setUpgrades] = useState(defaultUpgrades);
     const [meadCooldown, setMeadCooldown] = useState(0);
-
-    // Whenever `money` changes, notify parent
-    useEffect(() => {
-        onMoneyChange?.(money);
-    }, [money, onMoneyChange]);
 
     useImperativeHandle(
         ref,
@@ -48,19 +42,19 @@ const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange }, ref)
             // Now you can pass a positive or negative number to add or subtract money
             changeMoney(amount = 20) {
                 const bonus = upgrades.higherEarnings ? 10 : 0;
-                setMoney(m => m + amount + (amount > 0 ? bonus : 0)); // add bonus only on positive
+                onMoneyChange?.(amount + (amount > 0 ? bonus : 0)); // Notify parent to update money
                 setRound(r => r + 1);
                 if (meadCooldown > 0) setMeadCooldown(c => c - 1);
             }
         }),
-        [upgrades.higherEarnings, meadCooldown]
+        [upgrades.higherEarnings, meadCooldown, onMoneyChange]
     );
 
     const purchaseUpgrade = useCallback(
         (type) => {
-            if (money < upgradeCosts[type] || upgrades[type]) return;
+            if (totalMoney < upgradeCosts[type] || upgrades[type]) return;
 
-            setMoney((m) => m - upgradeCosts[type]);
+            onMoneyChange?.(-upgradeCosts[type]); // Subtract upgrade cost
             setUpgrades((prev) => {
                 const updated = { ...prev, [type]: true };
                 const unlocked = Object.entries(updated)
@@ -73,7 +67,7 @@ const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange }, ref)
 
             onUpgrade?.(type);
         },
-        [money, upgrades, onUpgrade]
+        [totalMoney, upgrades, onUpgrade, onMoneyChange]
     );
 
     const handleUseMeadFridge = useCallback(() => {
@@ -86,7 +80,7 @@ const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange }, ref)
     return (
         <div className="panel sidebar">
             <h2>Progress</h2>
-            <p>💰 Money: ${money}</p>
+            <p>💰 Money: ${totalMoney.toFixed(2)}</p>
             <p>🔁 Round: {round}</p>
 
             {upgrades.meadFridge && (
@@ -109,7 +103,7 @@ const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange }, ref)
                     {idx > 0 && <br />}
                     <button
                         onClick={() => purchaseUpgrade(type)}
-                        disabled={upgrades[type]}
+                        disabled={upgrades[type] || totalMoney < upgradeCosts[type]}
                         className="button"
                     >
                         {upgradeLabels[type](upgradeCosts[type])}
