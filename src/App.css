@@ -1,0 +1,107 @@
+/* Three columns layout */
+html {
+  background: #1a1a1a;
+}
+
+.layout {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Column panels */
+.sidebar, .mix-panel, .cocktail-book {
+  flex: 1;
+}
+
+/* Panel base */
+.panel {
+  background: #2a1f0d;        /* dark wood tone */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  color: #f0e6d2;            /* parchment-like text */
+}
+
+/* Buttons */
+.button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 4px 0;
+  transition: background 0.2s;
+}
+.button-filter{
+  background: #c09028;
+  color: #2a1f0d;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+.button-filter.selected {
+  background: #222;
+  color: #ffcc00;
+  box-shadow: 0 0 12px #ffcc00;
+}
+.button-green {
+  background: #4a7c59;
+  color: #f0e6d2;
+}
+.button-green:disabled {
+  background: #555;
+}
+.button-red {
+  background: #8c2c2c;
+  color: #f0e6d2;
+}
+.button-yellow {
+  background: #c09028;
+  color: #2a1f0d;
+}
+.button-mix {
+  background: #7b4f1e;
+  color: #f0e6d2;
+}
+.ingredient-tag {
+  margin-left: 8px;
+  padding: 2px 6px;
+  background: #444;
+  color: #ddd;
+  font-size: 0.75rem;
+  border-radius: 3px;
+}
+
+
+/* Header */
+.header {
+  font-size: 2.5rem;
+  color: #c09028;
+  margin-bottom: 10px;
+}
+
+.cocktail-item {
+  background: rgba(75, 75, 75, 0.7);
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  color: #f0e6d2;
+  font-weight: 600;
+}
+
+.cocktail-item:hover {
+  background: #c09028;
+  color: #2a1f0d;
+  box-shadow: 0 0 10px #c09028;
+}
+
+.cocktail-item.selected {
+  background: #222;
+  color: #ffcc00;
+  box-shadow: 0 0 12px #ffcc00;
+}
