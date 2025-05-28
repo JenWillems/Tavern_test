@@ -82,7 +82,7 @@ export default function App() {
     const handleSelectGarnish = useCallback(
         (name) => {
             if (showReport) return;
-            setGarnish((g) => (g === name ? null : name));
+            setGarnish((g) => (g === name ? null : { name }));
         },
         [showReport]
     );
@@ -97,12 +97,15 @@ export default function App() {
 
     // Serve the drink
     const handleServe = useCallback(() => {
-        const pts = evaluateDrink(mixGlass, mission, garnish, prepMethod);
-        if (pts > 0) {
-            alert(`✅ Served! +${pts} gold.`);
-            setScore((s) => s + pts);
+        const result = evaluateDrink(mixGlass, mission, garnish, prepMethod);
+        if (result.points > 0) {
+            const message = result.isKnownRecipe 
+                ? `✅ Perfect ${result.drinkName}! +${result.points} gold.`
+                : `✅ Created ${result.drinkName}! +${result.points} gold.`;
+            alert(message);
+            setScore((s) => s + result.points);
             setDrinksServed((n) => n + 1);
-            progressRef.current?.changeMoney(pts);
+            progressRef.current?.changeMoney(result.points);
         } else {
             alert(`❌ Drink didn't meet requirements. No gold awarded.`);
         }
@@ -200,9 +203,10 @@ export default function App() {
                                 key={g.name}
                                 onClick={() => handleSelectGarnish(g.name)}
                                 disabled={showReport}
-                                className={`button button-garnish${garnish === g.name ? ' selected' : ''}`}
+                                className={`button button-garnish${garnish?.name === g.name ? ' selected' : ''}`}
                             >
                                 {g.name}
+                                <span className="ingredient-tag">{g.type}</span>
                             </button>
                         ))}
                     </div>
@@ -232,7 +236,7 @@ export default function App() {
                             ))}
                             {garnish && (
                                 <li>
-                                    <em>Garnish:</em> {garnish}
+                                    <em>Garnish:</em> {garnish.name} <small>({garnish.type})</small>
                                 </li>
                             )}
                             {prepMethod && (

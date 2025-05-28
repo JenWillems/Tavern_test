@@ -1,10 +1,10 @@
 // Cocktail.jsx
 import { useState, useMemo, useCallback } from 'react';
-import { INGREDIENTS, GARNISHES } from './GameLogic';
+import { INGREDIENTS, GARNISHES, PREP_METHODS } from './GameLogic';
 import { cocktailRecipes } from './CocktailData';
 
-// De drie mogelijk serving methodes
-const SERVING_METHODS = ['SHAKEN', 'STIRRED', 'POURED'];
+// Use the same serving methods as defined in GameLogic
+const SERVING_METHODS = PREP_METHODS;
 
 const styles = {
     container: {

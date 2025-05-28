@@ -19,10 +19,10 @@ export const INGREDIENTS = [
  * Affects drink evaluation for certain missions
  */
 export const GARNISHES = [
-    { name: 'Lemon Twist' },
-    { name: 'Olive' },
-    { name: 'Mint Leaf' },
-    { name: 'Cherry' },
+    { name: 'Chili Flake', type: 'Strong' },
+    { name: 'Lemon Twist', type: 'Sour' },
+    { name: 'Mint Leaf', type: 'Bitter' },
+    { name: 'Sugar Rim', type: 'Sweet' },
 ];
 
 /**
@@ -34,6 +34,15 @@ export const TYPES = ['Sweet', 'Sour', 'Strong', 'Bitter'];
  * Available drink preparation methods
  */
 export const PREP_METHODS = ['Shaken', 'Stirred', 'Poured'];
+
+/**
+ * Mission difficulty multipliers for scoring
+ */
+const DIFFICULTY_MULTIPLIERS = {
+    EASY: 1,
+    MEDIUM: 1.5,
+    HARD: 2
+};
 
 // ============= Helper Functions =============
 
@@ -64,33 +73,128 @@ const getRandomTypes = count =>
  */
 const getRandomIngredient = () => randomItem(INGREDIENTS);
 
+/**
+ * Find a similar cocktail by comparing ingredients
+ * @param {Object} cocktail Base cocktail to compare
+ * @returns {Object} Similar cocktail with one ingredient different
+ */
+const findSimilarCocktail = (cocktail) => {
+    return cocktailRecipes.find(other => {
+        if (other.name === cocktail.name) return false;
+        
+        // Check if ingredients are similar (only one different)
+        const baseIngredients = [...cocktail.ingredients].sort();
+        const otherIngredients = [...other.ingredients].sort();
+        
+        // Must be same length or one off
+        if (Math.abs(baseIngredients.length - otherIngredients.length) > 1) return false;
+        
+        // Count differences
+        const differences = baseIngredients.filter(ing => !otherIngredients.includes(ing)).length +
+                          otherIngredients.filter(ing => !baseIngredients.includes(ing)).length;
+        
+        return differences <= 2; // Allow up to 2 ingredient differences
+    });
+};
+
 // ============= Drink Evaluation =============
 
 /**
+ * Generate a name for a drink based on its ingredients and preparation
+ * @param {Array} ingredients List of ingredients used
+ * @param {string|null} prepMethod How the drink was prepared
+ * @param {string|null} garnish Garnish used, if any
+ * @returns {Object} Drink name and whether it matches a known recipe
+ */
+const generateDrinkName = (ingredients, prepMethod = null, garnish = null) => {
+    // First check if it matches any known cocktail recipe exactly
+    const matchingCocktail = cocktailRecipes.find(recipe => {
+        const recipeIngs = [...recipe.ingredients].sort();
+        const drinkIngs = ingredients.map(i => i.name).sort();
+        
+        const ingredientsMatch = recipeIngs.length === drinkIngs.length &&
+            recipeIngs.every((v, i) => v === drinkIngs[i]);
+            
+        const garnishMatch = !recipe.garnishes ||
+            (garnish?.name && recipe.garnishes.includes(garnish.name));
+            
+        const prepMatch = !recipe.serving ||
+            prepMethod === recipe.serving;
+            
+        return ingredientsMatch && garnishMatch && prepMatch;
+    });
+
+    if (matchingCocktail) {
+        return {
+            name: matchingCocktail.name,
+            isKnownRecipe: true
+        };
+    }
+
+    // If no match, generate a descriptive name
+    const types = [...new Set(ingredients.map(i => i.type))];
+    const mainFlavor = types.length === 1 ? types[0] : 
+        types.length === 2 ? `${types[0]}-${types[1]}` : 'Mixed';
+    
+    // Get ingredient names without duplicates
+    const uniqueIngredients = [...new Set(ingredients.map(i => i.name))];
+    
+    // Create base name from ingredients
+    let name = uniqueIngredients.join('-');
+    
+    // Add preparation method if specified
+    if (prepMethod) {
+        name = `${prepMethod} ${name}`;
+    }
+    
+    // Add garnish if specified and include its type
+    if (garnish?.name) {
+        name += ` with ${garnish.name} (${garnish.type})`;
+    }
+
+    return {
+        name,
+        isKnownRecipe: false
+    };
+};
+
+/**
  * Evaluate a drink against the current mission requirements
- * Returns points earned based on how well the drink matches the mission
+ * Returns points earned and drink information
  * 
  * @param {Array} mixGlass - Array of ingredients in the current drink
  * @param {Object} mission - Current mission requirements
  * @param {string|null} garnish - Applied garnish, if any
  * @param {string|null} prepMethod - Preparation method used
- * @returns {number} Points earned for the drink
+ * @returns {Object} Evaluation results including points and drink name
  */
 export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = null) {
-    if (!mission) return 0;
+    if (!mission) return { points: 0, drinkName: '' };
+
+    // Generate drink name first
+    const { name: drinkName, isKnownRecipe } = generateDrinkName(mixGlass, prepMethod, garnish);
 
     // Helper function to check cocktail requirements
     const checkCocktailMatch = (cocktail) => {
-        // Check ingredients
-        const ingNames = mixGlass.map(i => i.name).sort();
-        const target = [...cocktail.ingredients].sort();
-        const ingredientsMatch = ingNames.length === target.length &&
-            target.every((v, i) => v === ingNames[i]);
+        // Check ingredients with exact counts
+        const ingCounts = {};
+        mixGlass.forEach(ing => {
+            ingCounts[ing.name] = (ingCounts[ing.name] || 0) + 1;
+        });
+
+        const recipeCounts = {};
+        cocktail.ingredients.forEach(ing => {
+            recipeCounts[ing] = (recipeCounts[ing] || 0) + 1;
+        });
+
+        // Check if ingredient counts match exactly
+        const ingredientsMatch = Object.keys({ ...ingCounts, ...recipeCounts }).every(ing => 
+            ingCounts[ing] === recipeCounts[ing]
+        );
 
         // Check garnish if specified
         const garnishMatch = !cocktail.garnishes || 
-            (Array.isArray(cocktail.garnishes) && 
-            cocktail.garnishes.includes(garnish));
+            (garnish && cocktail.garnishes.includes(garnish.name));
 
         // Check preparation method if specified
         const servingMatch = !cocktail.serving ||
@@ -99,45 +203,90 @@ export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = nu
         return ingredientsMatch && garnishMatch && servingMatch;
     };
 
-    // Evaluate based on mission type
+    // Calculate points based on mission type
+    let points = 0;
     switch (mission.missionType) {
-        case 'cocktail':
-            return checkCocktailMatch(mission.targetCocktail) ? 30 : 0;
-
-        case 'flavor':
-            // Count ingredients of required type
-            const flavorCount = mixGlass.filter(i => i.type === mission.targetType).length;
-            return flavorCount >= mission.requiredCount ? 20 : 0;
-
-        case 'ingredient':
-            // Check for specific ingredient
-            return mixGlass.some(i => i.name === mission.targetIngredient.name) ? 20 : 0;
-
-        case 'preparation':
-            // Check preparation method
-            return prepMethod === mission.targetPrep ? 25 : 0;
-
-        case 'garnishOnly':
-            // Check garnish
-            return garnish === mission.targetGarnish ? 15 : 0;
-
-        case 'noType':
-            // Check no forbidden types are used
-            return !mixGlass.some(i => mission.forbiddenTypes.includes(i.type)) ? 25 : 0;
-
-        case 'exactCount':
-            // Check exact ingredient count
-            return mixGlass.length === mission.targetCount ? 20 : 0;
-
-        case 'mixedTypes': {
-            // Check for multiple flavor types with emphasis on primary type
-            const primaryCount = mixGlass.filter(i => i.type === mission.targetTypes[0]).length;
-            return primaryCount >= 2 ? mission.targetTypes.length * 10 : 0;
+        case 'cocktail': {
+            const match = checkCocktailMatch(mission.targetCocktail);
+            points = match ? Math.floor(30 * (mission.difficulty || 1)) : 0;
+            break;
         }
 
-        default:
-            return 0;
+        case 'similarCocktail': {
+            const matchesTarget = checkCocktailMatch(mission.targetCocktail);
+            const matchesSimilar = checkCocktailMatch(mission.similarCocktail);
+            points = (matchesTarget || matchesSimilar) ? 
+                Math.floor(35 * DIFFICULTY_MULTIPLIERS.MEDIUM) : 0;
+            break;
+        }
+
+        case 'cocktailVariation': {
+            // Base ingredients must match except for the specified substitution
+            const ingNames = mixGlass.map(i => i.name).sort();
+            const targetIngs = [...mission.targetCocktail.ingredients]
+                .map(ing => ing === mission.originalIngredient ? mission.substitution : ing)
+                .sort();
+            
+            const ingredientsMatch = ingNames.length === targetIngs.length &&
+                targetIngs.every((v, i) => v === ingNames[i]);
+
+            // Check garnish and prep method as usual
+            const garnishMatch = !mission.targetCocktail.garnishes || 
+                (Array.isArray(mission.targetCocktail.garnishes) && 
+                mission.targetCocktail.garnishes.includes(garnish.name));
+
+            const servingMatch = !mission.targetCocktail.serving ||
+                mission.targetCocktail.serving === prepMethod;
+
+            points = (ingredientsMatch && garnishMatch && servingMatch) ? 
+                Math.floor(40 * DIFFICULTY_MULTIPLIERS.HARD) : 0;
+            break;
+        }
+
+        case 'flavor': {
+            const flavorCount = mixGlass.filter(i => i.type === mission.targetType).length;
+            points = flavorCount >= mission.requiredCount ? 20 : 0;
+            break;
+        }
+
+        case 'ingredient': {
+            points = mixGlass.some(i => i.name === mission.targetIngredient.name) ? 20 : 0;
+            break;
+        }
+
+        case 'preparation': {
+            points = prepMethod === mission.targetPrep ? 25 : 0;
+            break;
+        }
+
+        case 'garnishOnly': {
+            const targetGarnish = randomItem(GARNISHES);
+            points = targetGarnish.name === garnish ? 15 : 0;
+            break;
+        }
+
+        case 'noType': {
+            points = !mixGlass.some(i => mission.forbiddenTypes.includes(i.type)) ? 25 : 0;
+            break;
+        }
+
+        case 'exactCount': {
+            points = mixGlass.length === mission.targetCount ? 20 : 0;
+            break;
+        }
+
+        case 'mixedTypes': {
+            const primaryCount = mixGlass.filter(i => i.type === mission.targetTypes[0]).length;
+            points = primaryCount >= 2 ? mission.targetTypes.length * 10 : 0;
+            break;
+        }
     }
+
+    return {
+        points,
+        drinkName,
+        isKnownRecipe
+    };
 }
 
 // ============= Mission Generation =============
@@ -151,6 +300,18 @@ const missionPhrases = {
         name => `Serve me the legendary "${name}" cocktail.`,
         name => `I've heard great things about the "${name}". Make me one!`,
         name => `One "${name}" please, exactly as written.`,
+        name => `I'm craving a classic "${name}". Mix it up for me!`,
+        name => `Show me your best "${name}" cocktail.`,
+    ],
+    similarCocktail: [
+        (target, similar) => `Make me either a "${target}" or a "${similar}".`,
+        (target, similar) => `I like "${target}" and "${similar}". Surprise me with either!`,
+        (target, similar) => `Give me your take on a "${target}" or "${similar}".`,
+    ],
+    cocktailVariation: [
+        (name, orig, sub) => `Make me a "${name}" but use ${sub} instead of ${orig}.`,
+        (name, orig, sub) => `I want a "${name}" variation - replace the ${orig} with ${sub}.`,
+        (name, orig, sub) => `Mix a "${name}" for me, but substitute ${sub} for the ${orig}.`,
     ],
     flavor: [
         (type, count) => `Give me a ${type.toLowerCase()} drink with at least ${count} ${type.toLowerCase()} ingredients.`,
@@ -163,9 +324,9 @@ const missionPhrases = {
         method => `${method} is the only way to prepare my drink.`,
     ],
     garnish: [
-        garnish => `Don't forget the ${garnish} on top!`,
-        garnish => `I specifically want a ${garnish} garnish.`,
-        garnish => `Make it pretty with a ${garnish}.`,
+        garnish => `I need something with a ${garnish} garnish for that ${GARNISHES.find(g => g.name === garnish)?.type.toLowerCase()} kick!`,
+        garnish => `Add a ${garnish} on top - I love that ${GARNISHES.find(g => g.name === garnish)?.type.toLowerCase()} touch.`,
+        garnish => `Make it fancy with a ${garnish} garnish. I'm in the mood for something ${GARNISHES.find(g => g.name === garnish)?.type.toLowerCase()}.`,
     ],
     noType: [
         types => `I can't handle ${types.join(' or ')} drinks today.`,
@@ -186,7 +347,8 @@ const missionPhrases = {
  */
 export function getRandomMission() {
     const missionTypes = [
-        'cocktail', 'flavor', 'ingredient', 'mixedTypes',
+        'cocktail', 'cocktail', 'similarCocktail', 'cocktailVariation', // More weight to cocktail missions
+        'flavor', 'ingredient', 'mixedTypes',
         'preparation', 'garnishOnly', 'noType', 'exactCount'
     ];
     
@@ -205,7 +367,52 @@ export function getRandomMission() {
                     missionType: 'cocktail',
                     text: phrase('cocktail')(cocktail.name),
                     targetCocktail: cocktail,
+                    difficulty: DIFFICULTY_MULTIPLIERS.EASY,
                     tags: ['cocktail', ...(cocktail.tags || []).map(t => t.toLowerCase())],
+                };
+                break;
+            }
+
+            case 'similarCocktail': {
+                const baseCocktail = randomItem(cocktailRecipes);
+                if (!baseCocktail) continue;
+                
+                const similarCocktail = findSimilarCocktail(baseCocktail);
+                if (!similarCocktail) continue;
+
+                mission = {
+                    missionType: 'similarCocktail',
+                    text: phrase('similarCocktail')(baseCocktail.name, similarCocktail.name),
+                    targetCocktail: baseCocktail,
+                    similarCocktail: similarCocktail,
+                    tags: ['cocktail', 'variation'],
+                };
+                break;
+            }
+
+            case 'cocktailVariation': {
+                const cocktail = randomItem(cocktailRecipes);
+                if (!cocktail) continue;
+
+                // Pick a random ingredient to substitute
+                const originalIngredient = randomItem(cocktail.ingredients);
+                if (!originalIngredient) continue;
+
+                // Find a different ingredient of the same type
+                const substitution = randomItem(
+                    INGREDIENTS
+                        .filter(i => i.name !== originalIngredient)
+                        .map(i => i.name)
+                );
+                if (!substitution) continue;
+
+                mission = {
+                    missionType: 'cocktailVariation',
+                    text: phrase('cocktailVariation')(cocktail.name, originalIngredient, substitution),
+                    targetCocktail: cocktail,
+                    originalIngredient,
+                    substitution,
+                    tags: ['cocktail', 'variation'],
                 };
                 break;
             }
@@ -236,12 +443,12 @@ export function getRandomMission() {
             }
 
             case 'garnishOnly': {
-                const targetGarnish = randomItem(GARNISHES).name;
+                const targetGarnish = randomItem(GARNISHES);
                 mission = {
                     missionType: 'garnishOnly',
-                    text: phrase('garnish')(targetGarnish),
-                    targetGarnish,
-                    tags: ['garnish'],
+                    text: phrase('garnish')(targetGarnish.name),
+                    targetGarnish: targetGarnish.name,
+                    tags: ['garnish', targetGarnish.type.toLowerCase()],
                 };
                 break;
             }
