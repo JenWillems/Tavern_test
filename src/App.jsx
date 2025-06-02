@@ -117,17 +117,30 @@ export default function App() {
 
     // Serve the drink
     const handleServe = useCallback(() => {
+        // First check if it matches any known recipe
         const result = evaluateDrink(mixGlass, mission, garnish, prepMethod);
-        if (result.points > 0) {
+        
+        // If it's a known recipe but doesn't match mission, still give some points
+        if (result.isKnownRecipe && result.points === 0) {
+            const basePoints = 15; // Base points for any known cocktail
+            const message = `✅ Perfect ${result.drinkName}! Not what was ordered, but still good! +${basePoints} gold.`;
+            alert(message);
+            setScore((s) => s + basePoints);
+            setDrinksServed((n) => n + 1);
+            progressRef.current?.changeMoney(basePoints);
+        } 
+        // If it matches the mission, give full points
+        else if (result.points > 0) {
             const message = result.isKnownRecipe 
-                ? `✅ Perfect ${result.drinkName}! +${result.points} gold.`
+                ? `✅ Perfect ${result.drinkName}! Exactly what was ordered! +${result.points} gold.`
                 : `✅ Created ${result.drinkName}! +${result.points} gold.`;
             alert(message);
             setScore((s) => s + result.points);
             setDrinksServed((n) => n + 1);
             progressRef.current?.changeMoney(result.points);
         } else {
-            alert(`❌ Drink didn't meet requirements. No gold awarded.`);
+            // If it's not a known recipe and doesn't match mission
+            alert(`❌ ${result.drinkName} - Not what was ordered. No gold awarded.`);
         }
         resetMix();
         setMission(getRandomMission());

@@ -354,7 +354,7 @@ body {
 
 /* Book styling */
 .tavern-book {
-    max-height: 600px;
+    max-height: 700px;
     position: relative;
     background: 
         linear-gradient(rgba(37, 24, 17, 0.95), rgba(37, 24, 17, 0.93)),

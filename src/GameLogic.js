@@ -169,10 +169,13 @@ const generateDrinkName = (ingredients, prepMethod = null, garnish = null) => {
  * @returns {Object} Evaluation results including points and drink name
  */
 export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = null) {
-    if (!mission) return { points: 0, drinkName: '' };
-
-    // Generate drink name first
+    // Generate drink name first - this will also check if it's a known recipe
     const { name: drinkName, isKnownRecipe } = generateDrinkName(mixGlass, prepMethod, garnish);
+
+    // If there's no mission (shouldn't happen), but it's a known recipe, return the name
+    if (!mission) {
+        return { points: 0, drinkName, isKnownRecipe };
+    }
 
     // Helper function to check cocktail requirements
     const checkCocktailMatch = (cocktail) => {
@@ -233,7 +236,7 @@ export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = nu
             // Check garnish and prep method as usual
             const garnishMatch = !mission.targetCocktail.garnishes || 
                 (Array.isArray(mission.targetCocktail.garnishes) && 
-                mission.targetCocktail.garnishes.includes(garnish.name));
+                mission.targetCocktail.garnishes.includes(garnish?.name));
 
             const servingMatch = !mission.targetCocktail.serving ||
                 mission.targetCocktail.serving === prepMethod;

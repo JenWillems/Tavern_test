@@ -160,4 +160,18 @@ export const cocktailRecipes = [
         notes: 'Tart and bright with a soft finish.',
         tags: ['Sour'],
     },
+    {
+        name: 'Clair Obscur',
+        ingredients: ['Firewater','Firewater','Firewater','Firewater',],
+        serving: POURED,
+        notes: 'Trying to drink away the memories from the game, huh?',
+        tags: ['Secret'],
+    },
+    {
+        name: 'De Pitapataplatypus',
+        ingredients: ['Berry','Honey','Firewater','Firewater'],
+        serving: SHAKEN,
+        notes: 'Try saying that 3 times in a row while drunk',
+        tags: ['Secret'],
+    },
 ];
