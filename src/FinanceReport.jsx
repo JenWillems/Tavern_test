@@ -18,38 +18,87 @@ export default function FinanceReport({ day, drinksServed, currentMoney, upgrade
     // Calculate all financial data for the day
     const {
         moneyEarned,
-        rentCost,
         boozeCost,
+        rentCost,
         foodCost,
         totalCost,
         net,
         newBalance
     } = getScoreData(drinksServed, currentMoney, upgrades);
 
+    // Calculate available money (ignoring debt)
+    const availableMoney = Math.max(0, newBalance);
+    // Calculate remaining debt (if any)
+    const remainingDebt = Math.min(0, newBalance);
+
     return (
-        <div
-            style={{
-                position: 'fixed',
-                top: 0, left: 0, right: 0, bottom: 0,
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000
-            }}
-        >
-            <GameOverScreen
-                day={day}
-                moneyEarned={moneyEarned}
-                rent={-rentCost}
-                booze={-boozeCost}
-                food={-foodCost}
-                totalCost={-totalCost}
-                net={net}
-                currentMoney={currentMoney}
-                newBalance={newBalance}
-                onNextDay={onNextDay}
-            />
+        <div className="finance-report-overlay">
+            <section className="finance-report">
+                <h2>Day {day} Financial Report</h2>
+                
+                {/* Previous balance */}
+                <div className="finance-row">
+                    <span>Previous Available:</span>
+                    <strong className="positive">${Math.max(0, currentMoney).toFixed(2)}</strong>
+                </div>
+                
+                {/* Financial details */}
+                <div className="finance-details">
+                    <div className="finance-row">
+                        <span>Money Earned:</span>
+                        <strong className="positive">${moneyEarned.toFixed(2)}</strong>
+                    </div>
+                    <div className="finance-row">
+                        <span>Rent Expense:</span>
+                        <strong className="negative">-${rentCost.toFixed(2)}</strong>
+                    </div>
+                    <div className="finance-row">
+                        <span>Booze Expense:</span>
+                        <strong className="negative">-${boozeCost.toFixed(2)}</strong>
+                    </div>
+                    <div className="finance-row">
+                        <span>Food Expense:</span>
+                        <strong className="negative">-${foodCost.toFixed(2)}</strong>
+                    </div>
+                    <div className="finance-row">
+                        <span>Total Expenses:</span>
+                        <strong className="negative">-${totalCost.toFixed(2)}</strong>
+                    </div>
+                </div>
+                
+                {/* Daily results */}
+                <div className="finance-row total">
+                    <span>Daily Net:</span>
+                    <strong className={net >= 0 ? 'positive' : 'negative'}>
+                        ${net.toFixed(2)}
+                    </strong>
+                </div>
+
+                {/* New available money */}
+                <div className="finance-row total">
+                    <span>New Available:</span>
+                    <strong className="positive">${availableMoney.toFixed(2)}</strong>
+                </div>
+
+                {/* Debt section */}
+                <div className="debt-section">
+                    <h3>Debt Status</h3>
+                    <div className="finance-row">
+                        <span>Remaining Debt:</span>
+                        <strong className="negative">${Math.abs(remainingDebt).toFixed(2)}</strong>
+                    </div>
+                    {upgrades.debtReduction && remainingDebt < 0 && (
+                        <p className="debt-note">5% debt reduction applied!</p>
+                    )}
+                </div>
+                
+                <button 
+                    onClick={() => onNextDay(newBalance)} 
+                    className="button button-gold"
+                >
+                    Begin Next Day ➡️
+                </button>
+            </section>
         </div>
     );
 }
