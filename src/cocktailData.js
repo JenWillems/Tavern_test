@@ -177,21 +177,13 @@ export const cocktailRecipes = [
     {
         name: 'Tralalero Tralala',
         ingredients: ['Herbal','Herbal','Herbal','Herbal'],
-        garnishes: LEMON_TWIST,
+        garnishes: MINT_LEAF,
         serving: SHAKEN,
         notes: 'Like a brain rot sing-along — endlessly bitter, a little confusing, and somehow impossible to stop repeating',
         tags: ['Secret'],
     },
     {
-        name: 'Tralalero Tralala',
-        ingredients: ['Herbal','Herbal','Herbal','Herbal'],
-        garnishes: LEMON_TWIST,
-        serving: SHAKEN,
-        notes: 'Like a brain rot sing-along — endlessly bitter, a little confusing, and somehow impossible to stop repeating',
-        tags: ['Secret'],
-    },
-    {
-        name: 'Billy Seed',
+        name: 'Billy’s Seed',
         ingredients: ['Strong','Herbal','Herbal','Sweet'],
         garnishes: LEMON_TWIST,
         serving: STIRRED,

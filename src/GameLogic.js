@@ -356,31 +356,34 @@ export function getRandomMission() {
     
     let mission = null;
 
+    // Filter out secret cocktails from available recipes for missions
+    const availableRecipes = cocktailRecipes.filter(recipe => !recipe.tags?.includes('Secret'));
+
     do {
         const chosenType = randomItem(missionTypes);
         const phrase = (type) => randomItem(missionPhrases[type] || []);
 
         switch (chosenType) {
             case 'cocktail': {
-            const cocktail = randomItem(cocktailRecipes);
-            if (!cocktail) continue;
+                const cocktail = randomItem(availableRecipes);
+                if (!cocktail) continue;
                 
-            mission = {
-                missionType: 'cocktail',
+                mission = {
+                    missionType: 'cocktail',
                     text: phrase('cocktail')(cocktail.name),
-                targetCocktail: cocktail,
+                    targetCocktail: cocktail,
                     difficulty: DIFFICULTY_MULTIPLIERS.EASY,
-                tags: ['cocktail', ...(cocktail.tags || []).map(t => t.toLowerCase())],
-            };
+                    tags: ['cocktail', ...(cocktail.tags || []).map(t => t.toLowerCase())],
+                };
                 break;
             }
 
             case 'similarCocktail': {
-                const baseCocktail = randomItem(cocktailRecipes);
+                const baseCocktail = randomItem(availableRecipes);
                 if (!baseCocktail) continue;
                 
                 const similarCocktail = findSimilarCocktail(baseCocktail);
-                if (!similarCocktail) continue;
+                if (!similarCocktail || similarCocktail.tags?.includes('Secret')) continue;
 
                 mission = {
                     missionType: 'similarCocktail',
@@ -393,7 +396,7 @@ export function getRandomMission() {
             }
 
             case 'cocktailVariation': {
-                const cocktail = randomItem(cocktailRecipes);
+                const cocktail = randomItem(availableRecipes);
                 if (!cocktail) continue;
 
                 // Pick a random ingredient to substitute
@@ -420,16 +423,16 @@ export function getRandomMission() {
             }
 
             case 'flavor': {
-            const [flavor] = getRandomTypes(1);
+                const [flavor] = getRandomTypes(1);
                 const requiredCount = 1 + Math.floor(Math.random() * 3);
                 
-            mission = {
-                missionType: 'flavor',
+                mission = {
+                    missionType: 'flavor',
                     text: phrase('flavor')(flavor, requiredCount),
-                targetType: flavor,
+                    targetType: flavor,
                     requiredCount,
-                tags: ['flavor', flavor.toLowerCase()],
-            };
+                    tags: ['flavor', flavor.toLowerCase()],
+                };
                 break;
             }
 
@@ -468,30 +471,29 @@ export function getRandomMission() {
 
             case 'exactCount': {
                 const targetCount = 1 + Math.floor(Math.random() * 4);
-            mission = {
+                mission = {
                     missionType: 'exactCount',
                     text: phrase('exactCount')(targetCount),
                     targetCount,
                     tags: ['count'],
-            };
+                };
                 break;
-        }
+            }
 
             default: {
                 // Fallback to mixed types mission
-            const count = 2 + Math.floor(Math.random() * (TYPES.length - 2));
-            const types = getRandomTypes(count);
-            mission = {
-                missionType: 'mixedTypes',
-                text: `Create a mostly ${types.map(t => t.toLowerCase()).join(' and ')} blend.`,
-                targetTypes: types,
-                tags: ['mixedTypes', ...types.map(t => t.toLowerCase())],
-            };
+                const count = 2 + Math.floor(Math.random() * (TYPES.length - 2));
+                const types = getRandomTypes(count);
+                mission = {
+                    missionType: 'mixedTypes',
+                    text: `Create a mostly ${types.map(t => t.toLowerCase()).join(' and ')} blend.`,
+                    targetTypes: types,
+                    tags: ['mixedTypes', ...types.map(t => t.toLowerCase())],
+                };
+            }
         }
-        }
-    } while (mission?.text === lastMissionText);
+    } while (!mission);
 
-    lastMissionText = mission?.text;
     return mission;
 }
 

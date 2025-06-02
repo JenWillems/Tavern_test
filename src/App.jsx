@@ -23,9 +23,27 @@ const TASTE_FILTERS = ['Strong', 'Sweet', 'Sour', 'Bitter'];
 const INITIAL_DEBT = -20000; // Starting debt
 const MAX_DAYS = 30; // Days until eviction
 
+// MLG sound effects
+const MLG_SOUNDS = {
+    AIRHORN: 'https://www.myinstants.com/media/sounds/mlg-airhorn.mp3',
+    WOMBO_COMBO: 'https://www.myinstants.com/media/sounds/wombo-combo.mp3',
+    OH_BABY: 'https://www.myinstants.com/media/sounds/oh-baby-a-triple.mp3',
+    WOW: 'https://www.myinstants.com/media/sounds/wow-mlg.mp3',
+    SMOKE_WEED: 'https://www.myinstants.com/media/sounds/snoop-dogg-smoke-weed-everyday.mp3',
+    MOM_CAMERA: 'https://www.myinstants.com/media/sounds/mom-get-the-camera.mp3',
+    INTERVENTION: 'https://www.myinstants.com/media/sounds/intervention-420.mp3',
+    HITMARKER: 'https://www.myinstants.com/media/sounds/hitmarker_2.mp3',
+    BACKGROUND: 'https://www.youtube.com/watch?v=t7AajPCSEMc'
+};
+
+// MLG background music
+const MLG_BACKGROUND = 'https://www.youtube.com/watch?v=t7AajPCSEMc';
+
 export default function App() {
     // Show lore popup initially
     const [showLore, setShowLore] = useState(true);
+    const [showSecretDiscovery, setShowSecretDiscovery] = useState(false);
+    const [discoveredSecret, setDiscoveredSecret] = useState(null);
     
     // Bar-game state
     const [mixGlass, setMixGlass] = useState([]);
@@ -120,6 +138,21 @@ export default function App() {
         // First check if it matches any known recipe
         const result = evaluateDrink(mixGlass, mission, garnish, prepMethod);
         
+        // Check if it's a secret recipe
+        const isSecret = result.isKnownRecipe && 
+            cocktailRecipes.find(c => c.name === result.drinkName)?.tags?.includes('Secret');
+        
+        if (isSecret) {
+            const secretRecipe = cocktailRecipes.find(c => c.name === result.drinkName);
+            setDiscoveredSecret(secretRecipe);
+            setShowSecretDiscovery(true);
+            // Add extra points for discovering a secret recipe
+            const secretBonus = 50;
+            setScore((s) => s + result.points + secretBonus);
+            progressRef.current?.changeMoney(result.points + secretBonus);
+            return;
+        }
+        
         // If it matches the mission, give full points
         if (result.points > 0) {
             const message = result.isKnownRecipe 
@@ -197,10 +230,14 @@ export default function App() {
     }, []);
 
     const filteredCocktails = useMemo(() => {
+        // First filter out secret cocktails
+        const nonSecretCocktails = cocktailRecipes.filter(c => !c.tags?.includes('Secret'));
+        
+        // Then apply taste filters
         const result =
             selectedFilters.length === 0
-                ? cocktailRecipes
-                : cocktailRecipes.filter((c) =>
+                ? nonSecretCocktails
+                : nonSecretCocktails.filter((c) =>
                     c.tags?.some((tag) => selectedFilters.includes(tag))
                 );
 
@@ -219,6 +256,140 @@ export default function App() {
         <div className="container">
             {showLore && (
                 <LorePopup onClose={() => setShowLore(false)} />
+            )}
+
+            {showSecretDiscovery && discoveredSecret && (
+                <div className="secret-discovery">
+                    {discoveredSecret.name === 'Tralalero Tralala' ? (
+                        <div className="brainrot-content sea-theme">
+                            {/* Sound effects */}
+                            <audio id="vineBoom" autoPlay>
+                                <source src="https://www.myinstants.com/media/sounds/vine-boom.mp3" type="audio/mp3" />
+                            </audio>
+
+                            {/* Video container with relative positioning */}
+                            <div className="video-container">
+                                <iframe
+                                    width="800"
+                                    height="315"
+                                    src="https://www.youtube.com/embed/ssOLDdXDUjQ?autoplay=1"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+
+                            {/* Explosion GIFs */}
+                            <div className="explosion-container">
+                                <img className="explosion explosion-1" src="https://media.tenor.com/images/16787d100a9f4a8349687f6e00c594bb/tenor.gif" alt="explosion" />
+                                <img className="explosion explosion-2" src="https://media.tenor.com/images/16787d100a9f4a8349687f6e00c594bb/tenor.gif" alt="explosion" />
+                                <img className="explosion explosion-3" src="https://media.tenor.com/images/16787d100a9f4a8349687f6e00c594bb/tenor.gif" alt="explosion" />
+                            </div>
+
+                            {/* Surreal sea meme elements */}
+                            <div className="random-images">
+                                <div className="floating-image shark">🦈</div>
+                                <div className="floating-image fish">🐠</div>
+                                <div className="floating-image dolphin">🐬</div>
+                                <div className="floating-image wave">🌊</div>
+                                <div className="floating-image shell">🐚</div>
+                                <div className="floating-image octopus">🐙</div>
+                                <div className="floating-image sneaker sneaker-left">👟</div>
+                                <div className="floating-image sneaker sneaker-right">👟</div>
+                                <div className="floating-image bubble bubble-1">○</div>
+                                <div className="floating-image bubble bubble-2">○</div>
+                                <div className="floating-image bubble bubble-3">○</div>
+                            </div>
+
+                            <div className="content-wrapper">
+                                <h2 className="brainrot-title">tralalero tralala</h2>
+                                <div className="recipe-container">
+                                    <p className="recipe-name">{discoveredSecret.name}</p>
+                                    <div className="recipe-notes">
+                                        {discoveredSecret.notes}
+                                    </div>
+                                </div>
+
+                                <div className="brainrot-bonus">
+                                    <span className="bonus-text">Porco Dio e porco Allah
+Ero con il mio fottuto figlio merdardo a giocare a Fortnite
+Quando a un punto arriva mia nonna
+Ornella Leccacappella</span>
+                                    <span className="bonus-subtext">....god this generation is doomed</span>
+                                </div>
+
+                                <button className="brainrot-button" onClick={() => {
+                                    setShowSecretDiscovery(false);
+                                    resetMix();
+                                    setMission(getRandomMission());
+                                }}>
+                                    return to land
+                                </button>
+                            </div>
+
+                            {/* Wavy overlay */}
+                            <div className="wave-overlay"></div>
+                        </div>
+                    ) : (
+                        <div className="secret-discovery-content">
+                            <div className="mlg-overlay"></div>
+                            <div className="doritos doritos-1">🔺</div>
+                            <div className="doritos doritos-2">🔺</div>
+                            <div className="doritos doritos-3">🔺</div>
+                            <div className="doritos doritos-4">🔺</div>
+                            <div className="glasses">🕶️</div>
+                            <div className="airhorn airhorn-left">📢</div>
+                            <div className="airhorn airhorn-right">📢</div>
+                            <div className="mlg-emoji mlg-emoji-1">👾</div>
+                            <div className="mlg-emoji mlg-emoji-2">🎮</div>
+                            <div className="mlg-emoji mlg-emoji-3">🎯</div>
+                            <div className="mlg-emoji mlg-emoji-4">💯</div>
+                            <div className="hitmarker hitmarker-1">✖️</div>
+                            <div className="hitmarker hitmarker-2">✖️</div>
+                            <div className="mountain-dew mountain-dew-1">🥤</div>
+                            <div className="mountain-dew mountain-dew-2">🥤</div>
+                            
+                            {/* YouTube player for MLG music */}
+                            <div className="mlg-music">
+                                <iframe
+                                    width="0"
+                                    height="0"
+                                    src="https://www.youtube.com/embed/t7AajPCSEMc?autoplay=1"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                            
+                            <h2>OH BABY A TRIPLE! 🎯</h2>
+                            <p className="subtitle">MOM GET THE CAMERA!!1!</p>
+                            <div className="wow-text">W🎯W</div>
+                            <p className="recipe-name">{discoveredSecret.name}</p>
+                            <div className="notes">
+                                {discoveredSecret.notes}
+                                <div className="hitmarker-container">
+                                    <span className="hitmarker-inner">✖️</span>
+                                </div>
+                            </div>
+                            <p className="bonus">
+                                +50 GOLD GET REKT M8!
+                                <br/>
+                                <small>*WOMBO COMBO*</small>
+                            </p>
+                            <div className="mlg-score">
+                                <span className="score-text">+420</span>
+                                <span className="score-text">NO SCOPE</span>
+                            </div>
+                            <button onClick={() => {
+                                setShowSecretDiscovery(false);
+                                resetMix();
+                                setMission(getRandomMission());
+                            }}>
+                                360 NO SCOPE
+                            </button>
+                        </div>
+                    )}
+                </div>
             )}
             
             <h1 className="header">🍻 TavernCraft — Day {day}</h1>
