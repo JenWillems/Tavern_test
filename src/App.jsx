@@ -120,17 +120,8 @@ export default function App() {
         // First check if it matches any known recipe
         const result = evaluateDrink(mixGlass, mission, garnish, prepMethod);
         
-        // If it's a known recipe but doesn't match mission, still give some points
-        if (result.isKnownRecipe && result.points === 0) {
-            const basePoints = 15; // Base points for any known cocktail
-            const message = `✅ Perfect ${result.drinkName}! Not what was ordered, but still good! +${basePoints} gold.`;
-            alert(message);
-            setScore((s) => s + basePoints);
-            setDrinksServed((n) => n + 1);
-            progressRef.current?.changeMoney(basePoints);
-        } 
         // If it matches the mission, give full points
-        else if (result.points > 0) {
+        if (result.points > 0) {
             const message = result.isKnownRecipe 
                 ? `✅ Perfect ${result.drinkName}! Exactly what was ordered! +${result.points} gold.`
                 : `✅ Created ${result.drinkName}! +${result.points} gold.`;
@@ -138,6 +129,15 @@ export default function App() {
             setScore((s) => s + result.points);
             setDrinksServed((n) => n + 1);
             progressRef.current?.changeMoney(result.points);
+        }
+        // If it's a known recipe but doesn't match mission, give base points
+        else if (result.isKnownRecipe) {
+            const basePoints = 15; // Base points for any known cocktail
+            const message = `✅ Perfect ${result.drinkName}! Not what was ordered, but still good! +${basePoints} gold.`;
+            alert(message);
+            setScore((s) => s + basePoints);
+            setDrinksServed((n) => n + 1);
+            progressRef.current?.changeMoney(basePoints);
         } else {
             // If it's not a known recipe and doesn't match mission
             alert(`❌ ${result.drinkName} - Not what was ordered. No gold awarded.`);

@@ -76,38 +76,41 @@ const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange, totalM
 
     const progressContent = (
         <>
-            <h2>💰 Progress</h2>
-            <div className="progress-section">
-                <p className="money-display">Money: ${totalMoney}</p>
-                
-                <h3>🔓 Available Upgrades</h3>
-                <div className="upgrade-list">
-                    {Object.entries(upgrades).map(([type, purchased]) => (
-                        <button
-                            key={type}
-                            onClick={() => handleUpgrade(type)}
-                            disabled={purchased || totalMoney < upgradeCosts[type]}
-                            className={`button${purchased ? ' purchased' : ''}`}
-                        >
-                            {upgradeLabels[type](upgradeCosts[type])}
-                            {purchased && ' ✓'}
-                        </button>
-                    ))}
-                </div>
-
-                {upgrades.meadFridge && (
-                    <div className="fridge-section">
-                        <h3>🧊 Mead Fridge</h3>
-                        <button
-                            onClick={handleUseFridge}
-                            disabled={fridgeUses >= 2}
-                            className="button button-fridge"
-                        >
-                            Use Fridge ({2 - fridgeUses} left)
-                        </button>
-                    </div>
-                )}
+            <h2>📊 Tavern Progress</h2>
+            
+            <div className="money-display">
+                Available Gold: ${Math.max(0, totalMoney)}
             </div>
+
+            <h3>🏆 Upgrades</h3>
+            <div className="upgrade-list">
+                {Object.entries(upgradeInfo).map(([key, info]) => (
+                    <button
+                        key={key}
+                        onClick={() => handleUpgrade(key)}
+                        disabled={upgrades[key] || Math.max(0, totalMoney) < upgradeCosts[key]}
+                        className={`button ${upgrades[key] ? 'purchased' : ''}`}
+                    >
+                        {upgrades[key] ? '✓ ' : ''}
+                        {upgradeLabels[key]} (${upgradeCosts[key]})
+                        <br />
+                        <small>{info}</small>
+                    </button>
+                ))}
+            </div>
+
+            {upgrades.meadFridge && (
+                <div className="fridge-section">
+                    <h3>🧊 Mead Fridge</h3>
+                    <button
+                        onClick={handleUseFridge}
+                        disabled={fridgeUses >= 2}
+                        className="button button-fridge"
+                    >
+                        Use Fridge ({2 - fridgeUses} left)
+                    </button>
+                </div>
+            )}
         </>
     );
 
