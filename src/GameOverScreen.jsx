@@ -1,5 +1,8 @@
 // GameOverScreen.jsx - End of day financial summary display
 import React from 'react';
+import './App.css';
+
+const MAX_DAYS = 30; // Days until eviction
 
 /**
  * Financial details to display in the report
@@ -43,44 +46,71 @@ export default function GameOverScreen({
 }) {
     // Collect all financial values for display
     const values = { moneyEarned, rent, booze, food, totalCost };
+    const daysLeft = MAX_DAYS - day;
+    const debtLeft = Math.min(0, newBalance);
 
     return (
-        <section style={{
-            background: 'white',
-            padding: 20,
-            borderRadius: 8,
-            minWidth: 300
-        }}>
-            <h2>Day {day} Financial Report</h2>
-            
-            {/* Previous balance */}
-            <p>Previous Balance: <strong>${currentMoney.toFixed(2)}</strong></p>
-            
-            {/* Financial details list */}
-            <ul>
-                {FINANCIAL_DETAILS.map(({ label, key }) => (
-                    <li key={key}>
-                        {label}: ${Number(values[key]).toFixed(2)}
-                    </li>
-                ))}
-            </ul>
-            
-            {/* Daily results */}
-            <p>
-                Daily Net: <strong>${net.toFixed(2)}</strong>
-            </p>
-            <p>
-                New Balance: <strong>${newBalance.toFixed(2)}</strong>
-            </p>
-            
-            {/* Next day button */}
-            <button 
-                onClick={() => onNextDay(newBalance)} 
-                style={{ marginTop: 10 }}
-                className="button button-blue"
-            >
-                ➡️ Next Day
-            </button>
-        </section>
+        <div className="finance-report-overlay">
+            <section className="finance-report">
+                <h2>Day {day} Financial Report</h2>
+                
+                {/* Previous balance */}
+                <div className="finance-row">
+                    <span>Previous Balance:</span>
+                    <strong className={currentMoney >= 0 ? 'positive' : 'negative'}>
+                        ${currentMoney.toFixed(2)}
+                    </strong>
+                </div>
+                
+                {/* Financial details list */}
+                <div className="finance-details">
+                    {FINANCIAL_DETAILS.map(({ label, key }) => (
+                        <div key={key} className="finance-row">
+                            <span>{label}:</span>
+                            <strong className={values[key] >= 0 ? 'positive' : 'negative'}>
+                                ${Number(values[key]).toFixed(2)}
+                            </strong>
+                        </div>
+                    ))}
+                </div>
+                
+                {/* Daily results */}
+                <div className="finance-row total">
+                    <span>Daily Net:</span>
+                    <strong className={net >= 0 ? 'positive' : 'negative'}>
+                        ${net.toFixed(2)}
+                    </strong>
+                </div>
+                <div className="finance-row total">
+                    <span>New Balance:</span>
+                    <strong className={newBalance >= 0 ? 'positive' : 'negative'}>
+                        ${newBalance.toFixed(2)}
+                    </strong>
+                </div>
+
+                {/* Progress towards goal */}
+                <div className="progress-summary">
+                    <h3>Progress Update</h3>
+                    <div className="finance-row">
+                        <span>Days Remaining:</span>
+                        <strong>{daysLeft}</strong>
+                    </div>
+                    {debtLeft < 0 && (
+                        <div className="finance-row">
+                            <span>Remaining Debt:</span>
+                            <strong className="negative">${Math.abs(debtLeft).toFixed(2)}</strong>
+                        </div>
+                    )}
+                </div>
+                
+                {/* Next day button */}
+                <button 
+                    onClick={() => onNextDay(newBalance)} 
+                    className="button button-gold"
+                >
+                    Begin Next Day ➡️
+                </button>
+            </section>
+        </div>
     );
 }

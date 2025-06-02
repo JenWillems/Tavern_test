@@ -3,26 +3,34 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle, useCallbac
 import './App.css';
 
 const defaultUpgrades = {
-    moreIngredients: false,
-    higherEarnings: false,
+    groupBonus: false,
+    extraTime: false,
+    costReduction: false,
+    debtReduction: false,
     meadFridge: false,
 };
 
 const upgradeInfo = {
-    moreIngredients: 'Unlocks 4 brand-new ingredients in your bar.',
-    higherEarnings: 'Earn an extra $10 on every successful serve.',
+    groupBonus: 'Earn an extra 10 gold for each group of customers.',
+    extraTime: 'Get an extra minute (60 seconds) of serving time each day.',
+    costReduction: 'Reduce your daily operating costs.',
+    debtReduction: 'One-time 5% reduction in your current debt.',
     meadFridge: 'A mead fridge that you can use once every 2 rounds (after a serve).',
 };
 
 const upgradeCosts = {
-    moreIngredients: 400,
-    higherEarnings: 700,
+    groupBonus: 500,
+    extraTime: 800,
+    costReduction: 1000,
+    debtReduction: 600,
     meadFridge: 1200,
 };
 
 const upgradeLabels = {
-    moreIngredients: (cost) => `Unlock 4 Ingredients ($${cost})`,
-    higherEarnings: (cost) => `+$10 per Drink ($${cost})`,
+    groupBonus: (cost) => `+10 Gold Per Group ($${cost})`,
+    extraTime: (cost) => `+1 Minute Time ($${cost})`,
+    costReduction: (cost) => `Lower Daily Costs ($${cost})`,
+    debtReduction: (cost) => `-5% Debt One-Time ($${cost})`,
     meadFridge: (cost) => `Add Mead Fridge ($${cost})`,
 };
 
@@ -31,85 +39,85 @@ const showUpgradeAlerts = (unlocked, type) => {
     window.alert(`ℹ️ ${upgradeInfo[type]}`);
 };
 
-const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange, totalMoney }, ref) => {
-    const [round, setRound] = useState(1);
+const GameProgress = forwardRef(({ onUpgrade, onUseFridge, onMoneyChange, totalMoney, isBookView }, ref) => {
     const [upgrades, setUpgrades] = useState(defaultUpgrades);
-    const [meadCooldown, setMeadCooldown] = useState(0);
+    const [fridgeUses, setFridgeUses] = useState(0);
 
-    useImperativeHandle(
-        ref,
-        () => ({
-            // Now you can pass a positive or negative number to add or subtract money
-            changeMoney(amount = 20) {
-                const bonus = upgrades.higherEarnings ? 10 : 0;
-                onMoneyChange?.(amount + (amount > 0 ? bonus : 0)); // Notify parent to update money
-                setRound(r => r + 1);
-                if (meadCooldown > 0) setMeadCooldown(c => c - 1);
+    useImperativeHandle(ref, () => ({
+        changeMoney: (amount = 0) => {
+            if (amount > 0 && upgrades.groupBonus) {
+                amount += 10; // Add bonus for group orders
             }
-        }),
-        [upgrades.higherEarnings, meadCooldown, onMoneyChange]
-    );
-
-    const purchaseUpgrade = useCallback(
-        (type) => {
-            if (totalMoney < upgradeCosts[type] || upgrades[type]) return;
-
-            onMoneyChange?.(-upgradeCosts[type]); // Subtract upgrade cost
-            setUpgrades((prev) => {
-                const updated = { ...prev, [type]: true };
-                const unlocked = Object.entries(updated)
-                    .filter(([, unlocked]) => unlocked)
-                    .map(([key]) => key);
-
-                setTimeout(() => showUpgradeAlerts(unlocked, type), 0);
-                return updated;
-            });
-
-            onUpgrade?.(type);
+            onMoneyChange(amount);
         },
-        [totalMoney, upgrades, onUpgrade, onMoneyChange]
+        upgrades
+    }));
+
+    const handleUpgrade = useCallback((type) => {
+        const cost = upgradeCosts[type];
+        if (totalMoney >= cost) {
+            onMoneyChange(-cost);
+            setUpgrades(prev => ({ ...prev, [type]: true }));
+            showUpgradeAlerts([upgradeLabels[type](cost)], type);
+            onUpgrade(type);
+        }
+    }, [totalMoney, onMoneyChange, onUpgrade]);
+
+    const handleUseFridge = useCallback(() => {
+        if (fridgeUses < 2) {
+            setFridgeUses(prev => prev + 1);
+            onUseFridge();
+        }
+    }, [fridgeUses, onUseFridge]);
+
+    useEffect(() => {
+        setFridgeUses(0);
+    }, [totalMoney]);
+
+    const progressContent = (
+        <>
+            <h2>💰 Progress</h2>
+            <div className="progress-section">
+                <p className="money-display">Money: ${totalMoney}</p>
+                
+                <h3>🔓 Available Upgrades</h3>
+                <div className="upgrade-list">
+                    {Object.entries(upgrades).map(([type, purchased]) => (
+                        <button
+                            key={type}
+                            onClick={() => handleUpgrade(type)}
+                            disabled={purchased || totalMoney < upgradeCosts[type]}
+                            className={`button${purchased ? ' purchased' : ''}`}
+                        >
+                            {upgradeLabels[type](upgradeCosts[type])}
+                            {purchased && ' ✓'}
+                        </button>
+                    ))}
+                </div>
+
+                {upgrades.meadFridge && (
+                    <div className="fridge-section">
+                        <h3>🧊 Mead Fridge</h3>
+                        <button
+                            onClick={handleUseFridge}
+                            disabled={fridgeUses >= 2}
+                            className="button button-fridge"
+                        >
+                            Use Fridge ({2 - fridgeUses} left)
+                        </button>
+                    </div>
+                )}
+            </div>
+        </>
     );
 
-    const handleUseMeadFridge = useCallback(() => {
-        if (!upgrades.meadFridge || meadCooldown > 0) return;
-        setMeadCooldown(2);
-        window.alert('🍯 You used the mead fridge! Free serve unlocked.');
-        onUseFridge?.();
-    }, [upgrades.meadFridge, meadCooldown, onUseFridge]);
-
-    return (
-        <div className="panel sidebar">
-            <h2>Progress</h2>
-            <p>💰 Money: ${totalMoney.toFixed(2)}</p>
-            <p>🔁 Round: {round}</p>
-
-            {upgrades.meadFridge && (
-                <>
-                    <p>
-                        🍯 Mead Fridge:{' '}
-                        {meadCooldown > 0 ? `Cooldown (${meadCooldown} rounds left)` : 'Ready!'}
-                    </p>
-                    {meadCooldown === 0 && (
-                        <button onClick={handleUseMeadFridge} className="button button-yellow">
-                            Use Mead Fridge
-                        </button>
-                    )}
-                </>
-            )}
-
-            <h3>Upgrades:</h3>
-            {Object.keys(defaultUpgrades).map((type, idx) => (
-                <React.Fragment key={type}>
-                    {idx > 0 && <br />}
-                    <button
-                        onClick={() => purchaseUpgrade(type)}
-                        disabled={upgrades[type] || totalMoney < upgradeCosts[type]}
-                        className="button"
-                    >
-                        {upgradeLabels[type](upgradeCosts[type])}
-                    </button>
-                </React.Fragment>
-            ))}
+    return isBookView ? (
+        <div className="progress-book-view">
+            {progressContent}
+        </div>
+    ) : (
+        <div className="progress-panel">
+            {progressContent}
         </div>
     );
 });

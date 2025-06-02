@@ -11,9 +11,10 @@ import { getScoreData } from './GameLogic.js';
  * @param {number} props.day Current day number
  * @param {number} props.drinksServed Number of drinks served today
  * @param {number} props.currentMoney Current money before calculations
+ * @param {Object} props.upgrades Current upgrades state
  * @param {Function} props.onNextDay Callback for proceeding to next day
  */
-export default function FinanceReport({ day, drinksServed, currentMoney, onNextDay }) {
+export default function FinanceReport({ day, drinksServed, currentMoney, upgrades = {}, onNextDay }) {
     // Calculate all financial data for the day
     const {
         moneyEarned,
@@ -23,7 +24,7 @@ export default function FinanceReport({ day, drinksServed, currentMoney, onNextD
         totalCost,
         net,
         newBalance
-    } = getScoreData(drinksServed, currentMoney);
+    } = getScoreData(drinksServed, currentMoney, upgrades);
 
     return (
         <div

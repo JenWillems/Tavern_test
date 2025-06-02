@@ -10,6 +10,7 @@ import GameProgress from './GameProgress.jsx';
 import MissionDisplay from './MissionDisplay.jsx';
 import ScoreTime from './ScoreTime.jsx';
 import FinanceReport from './FinanceReport.jsx';
+import LorePopup from './LorePopup.jsx';
 
 const GARNISHES = [
     { name: 'Mint Leaf', type: 'Bitter' },
@@ -19,11 +20,16 @@ const GARNISHES = [
 ];
 
 const TASTE_FILTERS = ['Strong', 'Sweet', 'Sour', 'Bitter'];
+const INITIAL_DEBT = -20000; // Starting debt
+const MAX_DAYS = 30; // Days until eviction
 
 export default function App() {
+    // Show lore popup initially
+    const [showLore, setShowLore] = useState(true);
+    
     // Bar-game state
     const [mixGlass, setMixGlass] = useState([]);
-    const [money, setMoney] = useState(0);
+    const [money, setMoney] = useState(INITIAL_DEBT);
     const [garnish, setGarnish] = useState(null);
     const [prepMethod, setPrepMethod] = useState(null);
     const [mission, setMission] = useState(() => getRandomMission());
@@ -31,6 +37,7 @@ export default function App() {
     // Day/report state
     const [day, setDay] = useState(1);
     const [showReport, setShowReport] = useState(false);
+    const [gameOver, setGameOver] = useState(false);
 
     // Move the useEffect after day state is initialized
     useEffect(() => {
@@ -47,6 +54,17 @@ export default function App() {
 
     const progressRef = useRef();
 
+    // Check for game over conditions
+    useEffect(() => {
+        if (day > MAX_DAYS) {
+            setGameOver(true);
+            alert(`Game Over! You've run out of time. The Merchants Guild has seized The Tipsy Dragon.`);
+        } else if (money >= 0) {
+            setGameOver(true);
+            alert(`Congratulations! You've paid off the debt and saved The Tipsy Dragon!`);
+        }
+    }, [day, money]);
+
     // 3) Handler to receive money updates from GameProgress
     const handleMoneyChange = useCallback((amount) => {
         setMoney(prevMoney => prevMoney + amount);
@@ -54,14 +72,14 @@ export default function App() {
 
     // Timer effect: countdown unless report is showing
     useEffect(() => {
-        if (showReport) return;
+        if (showReport || gameOver) return;
         if (timeLeft <= 0) {
             setShowReport(true);
             return;
         }
         const id = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
         return () => clearTimeout(id);
-    }, [timeLeft, showReport]);
+    }, [timeLeft, showReport, gameOver]);
 
     // Reset the mixing state
     const resetMix = useCallback(() => {
@@ -82,7 +100,9 @@ export default function App() {
     const handleSelectGarnish = useCallback(
         (name) => {
             if (showReport) return;
-            setGarnish((g) => (g === name ? null : { name }));
+            // Find the complete garnish object with type
+            const selectedGarnish = GARNISHES.find(g => g.name === name);
+            setGarnish((g) => (g?.name === name ? null : selectedGarnish));
         },
         [showReport]
     );
@@ -130,7 +150,25 @@ export default function App() {
     }, [resetMix]);
 
     // Upgrades & fridge from sidebar
-    const handleUpgrade = useCallback((type) => console.log('Upgrade:', type), []);
+    const handleUpgrade = useCallback((type) => {
+        switch(type) {
+            case 'extraTime':
+                setTimeLeft(prev => prev + 60); // Add 60 seconds
+                break;
+            case 'debtReduction':
+                // Debt reduction is handled in FinanceReport
+                break;
+            case 'costReduction':
+                // Cost reduction is handled in GameLogic
+                break;
+            case 'groupBonus':
+                // Group bonus is handled in GameProgress
+                break;
+            case 'meadFridge':
+                // Mead fridge is already handled
+                break;
+        }
+    }, []);
 
     const handleUseFridge = useCallback(() => {
         progressRef.current?.changeMoney();
@@ -161,21 +199,19 @@ export default function App() {
         setSelectedCocktail(null);
     }, []);
 
+    // Add state for active book tab
+    const [activeTab, setActiveTab] = useState('cocktails');
+
     return (
         <div className="container">
+            {showLore && (
+                <LorePopup onClose={() => setShowLore(false)} />
+            )}
+            
             <h1 className="header">🍻 TavernCraft — Day {day}</h1>
 
             <div className="layout">
                 {/* Sidebar: progress and upgrades */}
-                <aside className="sidebar panel">
-                    <GameProgress
-                        ref={progressRef}
-                        onUpgrade={handleUpgrade}
-                        onUseFridge={handleUseFridge}
-                        onMoneyChange={handleMoneyChange}
-                        totalMoney={money}
-                    />
-                </aside>
 
                 {/* Main mixing area */}
                 <main className="mix-panel panel">
@@ -284,57 +320,94 @@ export default function App() {
                     </button>
                 </main>
 
-                <aside className="cocktail-book panel">
-                    <h2>📖 Cocktail Book</h2>
-                    <div className="button-group">
-                        {TASTE_FILTERS.map((f) => (
-                            <button
-                                key={f}
-                                onClick={() => toggleFilter(f)}
-                                className={`button button-filter${selectedFilters.includes(f) ? ' selected' : ''}`}
-                            >
-                                {f}
-                            </button>
-                        ))}
-                        <button onClick={clearFilters} className="button button-small">
-                            Clear Filters
+                {/* Tavern Book with Tabs */}
+                <aside className="tavern-book">
+                    <div className="book-cover"></div>
+                    <div className="book-spine"></div>
+                    
+                    <div className="book-tabs">
+                        <button 
+                            className={`book-tab${activeTab === 'cocktails' ? ' active' : ''}`}
+                            onClick={() => setActiveTab('cocktails')}
+                        >
+                            📖 Cocktails
+                        </button>
+                        <button 
+                            className={`book-tab${activeTab === 'progress' ? ' active' : ''}`}
+                            onClick={() => setActiveTab('progress')}
+                        >
+                            📊 Progress
                         </button>
                     </div>
 
-                    {filteredCocktails.length === 0 ? (
-                        <p className="empty">No cocktails match.</p>
-                    ) : (
-                        filteredCocktails.map((c) => {
-                            const isSelected = selectedCocktail?.name === c.name;
-                            return (
-                                <React.Fragment key={c.name}>
-                                    <div
-                                        onClick={() => setSelectedCocktail(c)}
-                                        className={`cocktail-item${isSelected ? ' selected' : ''}`}
+                    <div className="book-content">
+                        {/* Cocktail Book Page */}
+                        <div className={`book-page cocktail-book${activeTab === 'cocktails' ? ' active' : ''}`}>
+                            <div className="button-group">
+                                {TASTE_FILTERS.map((f) => (
+                                    <button
+                                        key={f}
+                                        onClick={() => toggleFilter(f)}
+                                        className={`button button-filter${selectedFilters.includes(f) ? ' selected' : ''}`}
                                     >
-                                        <strong>{c.name}</strong>
-                                    </div>
+                                        {f}
+                                    </button>
+                                ))}
+                                <button onClick={clearFilters} className="button button-small">
+                                    Clear Filters
+                                </button>
+                            </div>
 
-                                    {isSelected && (
-                                        <div className="cocktail-details">
-                                            <h3>{c.name}</h3>
-                                            <p>
-                                                <em>{c.description}</em>
-                                            </p>
-                                            <p>Ingredients: {c.ingredients.join(', ')}</p>
-                                            <p>Tags: {c.tags?.join(', ') || 'None'}</p>
+                            {filteredCocktails.length === 0 ? (
+                                <p className="empty">No cocktails match.</p>
+                            ) : (
+                                filteredCocktails.map((c) => {
+                                    const isSelected = selectedCocktail?.name === c.name;
+                                    return (
+                                        <React.Fragment key={c.name}>
+                                            <div
+                                                onClick={() => setSelectedCocktail(c)}
+                                                className={`cocktail-item${isSelected ? ' selected' : ''}`}
+                                            >
+                                                <strong>{c.name}</strong>
+                                            </div>
 
-                                            {/* Garnish */}
-                                            {c.garnishes && <p><strong>Garnish:</strong> {c.garnishes}</p>}
+                                            {isSelected && (
+                                                <div className="cocktail-details">
+                                                    <h3>{c.name}</h3>
+                                                    <p>
+                                                        <em>{c.description}</em>
+                                                    </p>
+                                                    <p>Ingredients: {c.ingredients.join(', ')}</p>
+                                                    <p>Tags: {c.tags?.join(', ') || 'None'}</p>
 
-                                            {/* Serving */}
-                                            {c.serving && <p><strong>Serving:</strong> {c.serving}</p>}
-                                        </div>
-                                    )}
-                                </React.Fragment>
-                            );
-                        })
-                    )}
+                                                    {/* Garnish */}
+                                                    {c.garnishes && <p><strong>Garnish:</strong> {c.garnishes}</p>}
+
+                                                    {/* Serving */}
+                                                    {c.serving && <p><strong>Serving:</strong> {c.serving}</p>}
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    );
+                                })
+                            )}
+                            <span className="page-number page-number-right">2</span>
+                        </div>
+
+                        {/* Progress Page */}
+                        <div className={`book-page progress-page${activeTab === 'progress' ? ' active' : ''}`}>
+                            <GameProgress
+                                ref={progressRef}
+                                onUpgrade={handleUpgrade}
+                                onUseFridge={handleUseFridge}
+                                onMoneyChange={handleMoneyChange}
+                                totalMoney={money}
+                                isBookView={true}
+                            />
+                            <span className="page-number page-number-left">1</span>
+                        </div>
+                    </div>
                 </aside>
             </div>
 
@@ -343,6 +416,7 @@ export default function App() {
                 day={day} 
                 drinksServed={drinksServed} 
                 currentMoney={money}
+                upgrades={progressRef.current?.upgrades || {}}
                 onNextDay={handleNextDay} 
             />}
         </div>
