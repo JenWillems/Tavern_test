@@ -101,7 +101,7 @@ export const cocktailRecipes = [
     {
         name: 'Frostfire',
         ingredients: ['Firewater', 'Berry'],
-        garnishes: [...SUGAR_RIM, ...LEMON_TWIST],
+        garnishes: [SUGAR_RIM],
         serving: SHAKEN,
         notes: 'Icy sharp with a fiery finish.',
         tags: ['Strong'],
@@ -169,7 +169,7 @@ export const cocktailRecipes = [
     },
     {
         name: 'De Pitapataplatypus',
-        ingredients: ['Berry','Honey','Firewater','Firewater'],
+        ingredients: ['Firewater','Berry','Herbal','Honey'],
         serving: SHAKEN,
         notes: 'Try saying that 3 times in a row while drunk',
         tags: ['Secret'],
@@ -195,7 +195,7 @@ export const cocktailRecipes = [
         ingredients: ['Strong','Strong','Strong','Sweet'],
         garnishes: CHILI_FLAKE,
         serving: POURED,
-        notes: 'A true cocktail for the masochist. It hurts. You’ll ask for more.',
+        notes: 'A true cocktail for the masochist. It hurts. You’ll be ask for more.',
         tags: ['Secret'],
     },
 ];

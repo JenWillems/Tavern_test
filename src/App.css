@@ -67,7 +67,7 @@ body {
                  -1px 1px 0 var(--gold-dark),
                  1px 1px 0 var(--gold-dark);
     margin-bottom: 30px;
-    font-family: 'UnifrakturMaguntia', cursive;
+    font-family: 'Goudy Bookletter 1911', serif;
     letter-spacing: 3px;
     position: relative;
     opacity: 0.85;
@@ -640,7 +640,7 @@ body {
     font-size: 1.4em;
     color: var(--gold-light);
     position: relative;
-    font-family: 'UnifrakturMaguntia', cursive;
+    font-family: 'Goudy Bookletter 1911', serif;
     letter-spacing: 1px;
     box-shadow: 
         inset 0 0 60px rgba(0, 0, 0, 0.6),
@@ -885,7 +885,7 @@ body {
 .finance-report h2 {
     color: var(--gold);
     text-align: center;
-    font-family: 'UnifrakturMaguntia', cursive;
+    font-family: 'Goudy Bookletter 1911', serif;
     font-size: 2em;
     margin-bottom: 30px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -961,8 +961,15 @@ body {
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
 
 /* Add font imports for the weathered tavern look */
-@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Goudy+Bookletter+1911&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Metamorphous&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap');
+
+/* Import medieval-style fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap');
 
 /* Scrollbar styling for a worn look */
 ::-webkit-scrollbar {
@@ -1217,7 +1224,7 @@ body {
 .lore-popup h2 {
     color: var(--gold);
     text-align: center;
-    font-family: 'UnifrakturMaguntia', cursive;
+    font-family: 'Goudy Bookletter 1911', serif;
     font-size: 2.5em;
     margin-bottom: 30px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -1676,278 +1683,44 @@ body {
 /* Brainrot Meme Style - Sea Theme */
 .brainrot-content.sea-theme {
     position: relative;
-    background: linear-gradient(180deg, #87CEEB 0%, #1E90FF 50%, #000080 100%);
+    /* Simplified gradient for better performance */
+    background: linear-gradient(180deg, #87CEEB, #000080);
     padding: 40px;
     width: min(800px, 90%);
     border: 15px solid;
     border-image: repeating-linear-gradient(45deg, #1E90FF, #1E90FF 10px, #000080 10px, #000080 20px) 1;
-    box-shadow: 
-        0 0 50px rgba(0, 0, 0, 0.7),
-        inset 0 0 30px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
     overflow: hidden;
+    /* Use transform3d to enable GPU acceleration */
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
 }
 
-/* Wave overlay animation */
-@keyframes waveAnimation {
-    0% { transform: translateX(0) translateY(0) rotate(0); }
-    50% { transform: translateX(-25%) translateY(2%) rotate(1deg); }
-    100% { transform: translateX(0) translateY(0) rotate(0); }
-}
-
-.wave-overlay {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' d='M0 400c150 0 150 100 300 100s150-100 300-100 150 100 300 100' /%3E%3C/svg%3E");
-    animation: waveAnimation 10s infinite linear;
-    pointer-events: none;
-    opacity: 0.5;
-}
-
-/* Floating animations */
-@keyframes floatUpDown {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-20px) rotate(5deg); }
-}
-
-@keyframes sharkSwim {
-    0% { transform: translateX(0) translateY(0) rotate(0); }
-    25% { transform: translateX(30px) translateY(-20px) rotate(5deg); }
-    75% { transform: translateX(-30px) translateY(20px) rotate(-5deg); }
-    100% { transform: translateX(0) translateY(0) rotate(0); }
-}
-
-@keyframes bubbleFloat {
-    0% { transform: translateY(0) scale(1); opacity: 0; }
-    50% { transform: translateY(-100px) scale(1.5); opacity: 1; }
-    100% { transform: translateY(-200px) scale(1); opacity: 0; }
-}
-
-.floating-image {
-    position: absolute;
-    font-size: 40px;
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.floating-image.shark { 
-    top: 50%; 
-    left: 20%; 
-    font-size: 60px;
-    animation: sharkSwim 8s infinite;
-}
-
-.floating-image.fish { 
-    top: 30%; 
-    right: 15%; 
-    animation: floatUpDown 6s infinite;
-}
-
-.floating-image.dolphin { 
-    bottom: 20%; 
-    left: 40%; 
-    animation: sharkSwim 7s infinite reverse;
-}
-
-.floating-image.wave { 
-    top: 10%; 
-    right: 25%; 
-    animation: floatUpDown 4s infinite;
-}
-
-.floating-image.shell { 
-    bottom: 10%; 
-    right: 10%; 
-    animation: floatUpDown 5s infinite;
-}
-
-.floating-image.octopus { 
-    top: 60%; 
-    left: 10%; 
-    animation: floatUpDown 7s infinite;
-}
-
-.floating-image.sneaker-left { 
-    bottom: 15%; 
-    left: 20%;
-    transform: rotate(15deg);
-    animation: floatUpDown 6s infinite;
-}
-
-.floating-image.sneaker-right { 
-    bottom: 15%; 
-    left: 25%;
-    transform: rotate(-15deg);
-    animation: floatUpDown 6s infinite;
-    animation-delay: -0.5s;
-}
-
-.floating-image.bubble {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 20px;
-    animation: bubbleFloat 4s infinite;
-}
-
-.floating-image.bubble-1 { left: 30%; animation-delay: 0s; }
-.floating-image.bubble-2 { left: 50%; animation-delay: -1s; }
-.floating-image.bubble-3 { left: 70%; animation-delay: -2s; }
-
-/* Content styling */
-.sea-theme .content-wrapper {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
-}
-
-.sea-theme .brainrot-title {
-    font-family: 'Comic Sans MS', cursive;
-    font-size: 4em;
-    color: #fff;
-    text-shadow: 
-        3px 3px 0 #000080,
-        -3px -3px 0 #000080,
-        3px -3px 0 #000080,
-        -3px 3px 0 #000080;
-    margin: 20px 0;
-    animation: floatUpDown 3s infinite;
-}
-
-.sea-theme .brainrot-subtitle {
-    font-family: 'Courier New', monospace;
-    font-size: 1.5em;
-    color: #000;
-    margin: 15px 0;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    display: inline-block;
-    transform: rotate(-2deg);
-    border: 3px solid #000080;
-}
-
-.sea-theme .recipe-container {
-    background: rgba(255, 255, 255, 0.9);
-    border: 5px solid #000080;
-    padding: 20px;
-    margin: 30px 0;
-    position: relative;
-    transform: rotate(1deg);
-}
-
-.sea-theme .recipe-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(30, 144, 255, 0.1) 10px,
-        rgba(30, 144, 255, 0.1) 20px
-    );
-}
-
-.sea-theme .recipe-name {
-    font-family: 'Comic Sans MS', cursive;
-    font-size: 2.5em;
-    color: #000080;
-    margin: 10px 0;
-    transform: rotate(-1deg);
-}
-
-.sea-theme .recipe-notes {
-    font-family: 'Comic Sans MS', cursive;
-    font-size: 1.2em;
-    color: #000;
-    line-height: 1.4;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.8);
-    border: 3px solid #000080;
-    transform: rotate(1deg);
-}
-
-.sea-theme .brainrot-bonus {
-    margin: 30px 0;
-    animation: floatUpDown 2s infinite;
-}
-
-.sea-theme .bonus-text {
-    font-family: 'Impact', sans-serif;
-    font-size: 3em;
-    color: #fff;
-    text-shadow: 
-        2px 2px 0 #000080,
-        -2px -2px 0 #000080,
-        2px -2px 0 #000080,
-        -2px 2px 0 #000080;
-    display: block;
-}
-
-.sea-theme .bonus-subtext {
-    font-family: 'Comic Sans MS', cursive;
-    font-size: 1.5em;
-    color: #E0FFFF;
-    display: block;
-    margin-top: 10px;
-    font-style: italic;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.sea-theme .brainrot-button {
-    font-family: 'Comic Sans MS', cursive;
-    font-size: 2em;
-    padding: 15px 30px;
-    background: #1E90FF;
-    color: #fff;
-    border: 5px solid #000080;
-    cursor: pointer;
-    transform: rotate(-2deg);
-    transition: all 0.3s ease;
-    text-shadow: 2px 2px 0 #000080;
-    box-shadow: 5px 5px 0 #000080;
-}
-
-.sea-theme .brainrot-button:hover {
-    transform: rotate(2deg) scale(1.1);
-    box-shadow: 8px 8px 0 #000080;
-    background: #4169E1;
-}
-
-/* Explosion effects */
-.explosion-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 10;
-}
-
+/* Optimized explosion animations */
 @keyframes explode {
     0% { 
-        transform: scale(0) rotate(0deg); 
+        transform: scale(0); 
         opacity: 0;
     }
     20% { 
-        transform: scale(1.2) rotate(-10deg); 
+        transform: scale(1.2); 
         opacity: 1;
     }
     80% { 
-        transform: scale(1) rotate(10deg); 
+        transform: scale(1); 
         opacity: 1;
     }
     100% { 
-        transform: scale(1.5) rotate(0deg); 
+        transform: scale(1.5); 
         opacity: 0;
     }
+}
+
+.explosion-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
 }
 
 .explosion {
@@ -1955,6 +1728,9 @@ body {
     width: 150px;
     height: 150px;
     object-fit: cover;
+    /* Use transform3d for GPU acceleration */
+    transform: translate3d(0, 0, 0);
+    will-change: transform, opacity;
     animation: explode 1s ease-out forwards;
 }
 
@@ -1970,36 +1746,207 @@ body {
     animation-delay: 1s;
 }
 
-.explosion-3 {
-    bottom: 30%;
-    left: 40%;
-    animation-delay: 1.5s;
+/* Content wrapper */
+.sea-theme .content-wrapper {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    /* Enable GPU acceleration */
+    transform: translate3d(0, 0, 0);
 }
 
-/* Add screen shake effect */
-@keyframes screenShake {
-    0%, 100% { transform: translate(0, 0) rotate(0); }
-    25% { transform: translate(-10px, -10px) rotate(-1deg); }
-    50% { transform: translate(10px, 10px) rotate(1deg); }
-    75% { transform: translate(-5px, 5px) rotate(-0.5deg); }
+/* Title styling */
+.sea-theme .brainrot-title {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: clamp(2em, 5vw, 4em);
+    color: #fff;
+    text-shadow: 3px 3px 0 #000080;
+    margin: 20px 0;
+    /* Use transform3d for GPU acceleration */
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
 }
 
-.brainrot-content.sea-theme {
-    animation: screenShake 0.5s ease-in-out infinite;
+/* Recipe container */
+.sea-theme .recipe-container {
+    background: rgba(255, 255, 255, 0.9);
+    border: 5px solid #000080;
+    padding: 20px;
+    margin: 30px 0;
+    position: relative;
+    transform: rotate(1deg);
 }
 
-/* Make explosions more intense */
-.explosion {
-    filter: brightness(1.2) contrast(1.2);
-    mix-blend-mode: screen;
+.sea-theme .recipe-name {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: clamp(1.5em, 4vw, 2.5em);
+    color: #000080;
+    margin: 10px 0;
 }
 
-/* Add flash effect when vine boom plays */
+.sea-theme .recipe-notes {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: 1.2em;
+    color: #000;
+    line-height: 1.4;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 3px solid #000080;
+}
+
+/* Bonus text */
+.sea-theme .brainrot-bonus {
+    margin: 30px 0;
+}
+
+.sea-theme .bonus-text {
+    font-family: 'Impact', sans-serif;
+    font-size: clamp(1.5em, 4vw, 3em);
+    color: #fff;
+    text-shadow: 2px 2px 0 #000080;
+    display: block;
+}
+
+.sea-theme .bonus-subtext {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: clamp(1em, 3vw, 1.5em);
+    color: #E0FFFF;
+    display: block;
+    margin-top: 10px;
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Button styling */
+.sea-theme .brainrot-button {
+    font-family: 'Comic Sans MS', cursive;
+    font-size: clamp(1.2em, 3vw, 2em);
+    padding: 15px 30px;
+    background: #1E90FF;
+    color: #fff;
+    border: 5px solid #000080;
+    cursor: pointer;
+    transform: rotate(-2deg);
+    transition: transform 0.3s ease;
+    text-shadow: 2px 2px 0 #000080;
+    box-shadow: 5px 5px 0 #000080;
+}
+
+.sea-theme .brainrot-button:hover {
+    transform: rotate(2deg) scale(1.1);
+    box-shadow: 8px 8px 0 #000080;
+    background: #4169E1;
+}
+
+/* Screen flash effect for vine boom */
 @keyframes flash {
     0%, 100% { filter: brightness(1); }
     50% { filter: brightness(1.5); }
 }
 
-.sea-theme .content-wrapper {
-    animation: flash 0.2s ease-in-out infinite;
+/* Add minimal screen shake */
+@keyframes screenShake {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    25% { transform: translate3d(-5px, -5px, 0); }
+    75% { transform: translate3d(5px, 5px, 0); }
+}
+
+.brainrot-content.sea-theme {
+    animation: screenShake 0.5s ease-in-out;
+}
+
+/* Make explosions more visible */
+.explosion {
+    filter: brightness(1.2) contrast(1.2);
+    mix-blend-mode: screen;
+}
+
+/* Replace Comic Sans instances with medieval fonts */
+.brainrot-content {
+    font-family: 'MedievalSharp', 'Times New Roman', serif;
+}
+
+.brainrot-content .text-content {
+    font-family: 'MedievalSharp', 'Times New Roman', serif;
+}
+
+.brainrot-content .text-content h2 {
+    font-family: 'Uncial Antiqua', 'Times New Roman', serif;
+}
+
+.brainrot-content .text-content p {
+    font-family: 'Metamorphous', 'Times New Roman', serif;
+}
+
+.brainrot-content .text-content .emphasis {
+    font-family: 'MedievalSharp', 'Times New Roman', serif;
+}
+
+.brainrot-content .text-content .special {
+    font-family: 'Uncial Antiqua', 'Times New Roman', serif;
+}
+
+/* MLG style text */
+.mlg-text {
+    font-family: 'Uncial Antiqua', 'Times New Roman', serif;
+    text-transform: uppercase;
+    text-shadow: 
+        2px 2px 0 #ff0,
+        -2px -2px 0 #f00,
+        2px -2px 0 #0ff,
+        -2px 2px 0 #0f0;
+}
+
+.mlg-small {
+    font-family: 'MedievalSharp', 'Times New Roman', serif;
+}
+
+.mlg-large {
+    font-family: 'Uncial Antiqua', 'Times New Roman', serif;
+}
+
+.mlg-emphasis {
+    font-family: 'Metamorphous', 'Times New Roman', serif;
+}
+
+/* Update all Comic Sans instances */
+.brainrot-content,
+.brainrot-content .text-content,
+.brainrot-text,
+.discovery-text,
+.flavor-text {
+    font-family: 'MedievalSharp', 'Times New Roman', serif;
+}
+
+.brainrot-content .text-content h2,
+.discovery-header,
+.special-header {
+    font-family: 'Uncial Antiqua', 'Times New Roman', serif;
+}
+
+.brainrot-content .text-content p,
+.discovery-description,
+.flavor-description {
+    font-family: 'Metamorphous', 'Times New Roman', serif;
+}
+
+/* Replace Impact font instances */
+.mlg-popup .title,
+.mlg-popup .subtitle,
+.mlg-popup .score,
+.mlg-popup .bonus,
+.mlg-popup .achievement,
+.mlg-popup .special-text {
+    font-family: 'Uncial Antiqua', 'Times New Roman', serif;
+    text-transform: uppercase;
+    text-shadow: 
+        2px 2px 0 #ff0,
+        -2px -2px 0 #f00,
+        2px -2px 0 #0ff,
+        -2px 2px 0 #0f0;
+    letter-spacing: 1px;
 }

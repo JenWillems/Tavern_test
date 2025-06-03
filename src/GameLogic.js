@@ -1,11 +1,23 @@
 // GameLogic.js - Core game mechanics and mission generation
-import { cocktailRecipes } from './CocktailData';
+import { cocktailRecipes } from './cocktailData';
 
 // ============= Game Constants =============
 
 /**
+ * Game configuration constants
+ */
+export const GAME_CONFIG = {
+    DIFFICULTY_MULTIPLIERS: {
+        EASY: 1,
+        MEDIUM: 1.5,
+        HARD: 2
+    },
+    TYPES: ['Sweet', 'Sour', 'Strong', 'Bitter'],
+    PREP_METHODS: ['Shaken', 'Stirred', 'Poured']
+};
+
+/**
  * Base ingredients available in the game
- * Each has a name and associated flavor type
  */
 export const INGREDIENTS = [
     { name: 'Firewater', type: 'Strong' },
@@ -16,7 +28,6 @@ export const INGREDIENTS = [
 
 /**
  * Available garnishes for drink decoration
- * Affects drink evaluation for certain missions
  */
 export const GARNISHES = [
     { name: 'Chili Flake', type: 'Strong' },
@@ -24,25 +35,6 @@ export const GARNISHES = [
     { name: 'Mint Leaf', type: 'Bitter' },
     { name: 'Sugar Rim', type: 'Sweet' },
 ];
-
-/**
- * Core flavor categories that define drink characteristics
- */
-export const TYPES = ['Sweet', 'Sour', 'Strong', 'Bitter'];
-
-/**
- * Available drink preparation methods
- */
-export const PREP_METHODS = ['Shaken', 'Stirred', 'Poured'];
-
-/**
- * Mission difficulty multipliers for scoring
- */
-const DIFFICULTY_MULTIPLIERS = {
-    EASY: 1,
-    MEDIUM: 1.5,
-    HARD: 2
-};
 
 // ============= Helper Functions =============
 
@@ -62,7 +54,7 @@ const randomItem = arr =>
  * @returns {string[]} Array of randomly selected types
  */
 const getRandomTypes = count =>
-    TYPES
+    GAME_CONFIG.TYPES
         .slice()
         .sort(() => Math.random() - 0.5)
         .slice(0, count);
@@ -219,7 +211,7 @@ export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = nu
             const matchesTarget = checkCocktailMatch(mission.targetCocktail);
             const matchesSimilar = checkCocktailMatch(mission.similarCocktail);
             points = (matchesTarget || matchesSimilar) ? 
-                Math.floor(35 * DIFFICULTY_MULTIPLIERS.MEDIUM) : 0;
+                Math.floor(35 * GAME_CONFIG.DIFFICULTY_MULTIPLIERS.MEDIUM) : 0;
             break;
         }
 
@@ -242,7 +234,7 @@ export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = nu
                 mission.targetCocktail.serving === prepMethod;
 
             points = (ingredientsMatch && garnishMatch && servingMatch) ? 
-                Math.floor(40 * DIFFICULTY_MULTIPLIERS.HARD) : 0;
+                Math.floor(40 * GAME_CONFIG.DIFFICULTY_MULTIPLIERS.HARD) : 0;
             break;
         }
 
@@ -372,7 +364,7 @@ export function getRandomMission() {
                     missionType: 'cocktail',
                     text: phrase('cocktail')(cocktail.name),
                     targetCocktail: cocktail,
-                    difficulty: DIFFICULTY_MULTIPLIERS.EASY,
+                    difficulty: GAME_CONFIG.DIFFICULTY_MULTIPLIERS.EASY,
                     tags: ['cocktail', ...(cocktail.tags || []).map(t => t.toLowerCase())],
                 };
                 break;
@@ -437,7 +429,7 @@ export function getRandomMission() {
             }
 
             case 'preparation': {
-                const targetPrep = randomItem(PREP_METHODS);
+                const targetPrep = randomItem(GAME_CONFIG.PREP_METHODS);
                 mission = {
                     missionType: 'preparation',
                     text: phrase('prep')(targetPrep),
@@ -482,7 +474,7 @@ export function getRandomMission() {
 
             default: {
                 // Fallback to mixed types mission
-                const count = 2 + Math.floor(Math.random() * (TYPES.length - 2));
+                const count = 2 + Math.floor(Math.random() * (GAME_CONFIG.TYPES.length - 2));
                 const types = getRandomTypes(count);
                 mission = {
                     missionType: 'mixedTypes',
