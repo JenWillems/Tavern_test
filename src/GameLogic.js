@@ -107,8 +107,10 @@ const generateDrinkName = (ingredients, prepMethod = null, garnish = null) => {
         const ingredientsMatch = recipeIngs.length === drinkIngs.length &&
             recipeIngs.every((v, i) => v === drinkIngs[i]);
             
+        // Fixed garnish matching - check if garnish name is in recipe's garnishes array
         const garnishMatch = !recipe.garnishes ||
-            (garnish?.name && recipe.garnishes.includes(garnish.name));
+            !garnish ||
+            recipe.garnishes.includes(garnish.name);
             
         const prepMatch = !recipe.serving ||
             prepMethod === recipe.serving;
@@ -187,9 +189,10 @@ export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = nu
             ingCounts[ing] === recipeCounts[ing]
         );
 
-        // Check garnish if specified
+        // Fixed garnish matching - check if garnish name is in recipe's garnishes array
         const garnishMatch = !cocktail.garnishes || 
-            (garnish?.name && cocktail.garnishes.includes(garnish.name));
+            !garnish ||
+            cocktail.garnishes.includes(garnish.name);
 
         // Check preparation method if specified
         const servingMatch = !cocktail.serving ||
@@ -239,7 +242,9 @@ export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = nu
         }
 
         case 'flavor': {
-            const flavorCount = mixGlass.filter(i => i.type === mission.targetType).length;
+            // Count ingredients and garnish of the target type
+            const flavorCount = mixGlass.filter(i => i.type === mission.targetType).length +
+                (garnish && garnish.type === mission.targetType ? 1 : 0);
             points = flavorCount >= mission.requiredCount ? 20 : 0;
             break;
         }
@@ -260,17 +265,24 @@ export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = nu
         }
 
         case 'noType': {
-            points = !mixGlass.some(i => mission.forbiddenTypes.includes(i.type)) ? 25 : 0;
+            // Check both ingredients and garnish for forbidden types
+            const hasNoForbiddenType = !mixGlass.some(i => mission.forbiddenTypes.includes(i.type)) &&
+                (!garnish || !mission.forbiddenTypes.includes(garnish.type));
+            points = hasNoForbiddenType ? 25 : 0;
             break;
         }
 
         case 'exactCount': {
-            points = mixGlass.length === mission.targetCount ? 20 : 0;
+            // Include garnish in the total count if present
+            const totalCount = mixGlass.length + (garnish ? 1 : 0);
+            points = totalCount === mission.targetCount ? 20 : 0;
             break;
         }
 
         case 'mixedTypes': {
-            const primaryCount = mixGlass.filter(i => i.type === mission.targetTypes[0]).length;
+            // Count both ingredients and garnish for the primary type
+            const primaryCount = mixGlass.filter(i => i.type === mission.targetTypes[0]).length +
+                (garnish && garnish.type === mission.targetTypes[0] ? 1 : 0);
             points = primaryCount >= 2 ? mission.targetTypes.length * 10 : 0;
             break;
         }
@@ -347,22 +359,32 @@ export function getRandomMission() {
     ];
     
     let mission = null;
+    let attempts = 0;
+    const maxAttempts = 10;
 
     // Filter out secret cocktails from available recipes for missions
     const availableRecipes = cocktailRecipes.filter(recipe => !recipe.tags?.includes('Secret'));
 
     do {
-        const chosenType = randomItem(missionTypes);
-        const phrase = (type) => randomItem(missionPhrases[type] || []);
+        const chosenType = missionTypes[Math.floor(Math.random() * missionTypes.length)];
+        const phrase = (type) => {
+            const phrases = missionPhrases[type] || [];
+            return phrases[Math.floor(Math.random() * phrases.length)];
+        };
 
+        attempts++;
+        
         switch (chosenType) {
             case 'cocktail': {
-                const cocktail = randomItem(availableRecipes);
+                const cocktail = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
                 if (!cocktail) continue;
+                
+                const missionText = phrase('cocktail')(cocktail.name);
+                if (missionText === lastMissionText) continue;
                 
                 mission = {
                     missionType: 'cocktail',
-                    text: phrase('cocktail')(cocktail.name),
+                    text: missionText,
                     targetCocktail: cocktail,
                     difficulty: GAME_CONFIG.DIFFICULTY_MULTIPLIERS.EASY,
                     tags: ['cocktail', ...(cocktail.tags || []).map(t => t.toLowerCase())],
@@ -371,15 +393,18 @@ export function getRandomMission() {
             }
 
             case 'similarCocktail': {
-                const baseCocktail = randomItem(availableRecipes);
+                const baseCocktail = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
                 if (!baseCocktail) continue;
                 
                 const similarCocktail = findSimilarCocktail(baseCocktail);
                 if (!similarCocktail || similarCocktail.tags?.includes('Secret')) continue;
 
+                const missionText = phrase('similarCocktail')(baseCocktail.name, similarCocktail.name);
+                if (missionText === lastMissionText) continue;
+                
                 mission = {
                     missionType: 'similarCocktail',
-                    text: phrase('similarCocktail')(baseCocktail.name, similarCocktail.name),
+                    text: missionText,
                     targetCocktail: baseCocktail,
                     similarCocktail: similarCocktail,
                     tags: ['cocktail', 'variation'],
@@ -388,7 +413,7 @@ export function getRandomMission() {
             }
 
             case 'cocktailVariation': {
-                const cocktail = randomItem(availableRecipes);
+                const cocktail = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
                 if (!cocktail) continue;
 
                 // Pick a random ingredient to substitute
@@ -403,9 +428,12 @@ export function getRandomMission() {
                 );
                 if (!substitution) continue;
 
+                const missionText = phrase('cocktailVariation')(cocktail.name, originalIngredient, substitution);
+                if (missionText === lastMissionText) continue;
+                
                 mission = {
                     missionType: 'cocktailVariation',
-                    text: phrase('cocktailVariation')(cocktail.name, originalIngredient, substitution),
+                    text: missionText,
                     targetCocktail: cocktail,
                     originalIngredient,
                     substitution,
@@ -418,9 +446,12 @@ export function getRandomMission() {
                 const [flavor] = getRandomTypes(1);
                 const requiredCount = 1 + Math.floor(Math.random() * 3);
                 
+                const missionText = phrase('flavor')(flavor, requiredCount);
+                if (missionText === lastMissionText) continue;
+                
                 mission = {
                     missionType: 'flavor',
-                    text: phrase('flavor')(flavor, requiredCount),
+                    text: missionText,
                     targetType: flavor,
                     requiredCount,
                     tags: ['flavor', flavor.toLowerCase()],
@@ -430,9 +461,12 @@ export function getRandomMission() {
 
             case 'preparation': {
                 const targetPrep = randomItem(GAME_CONFIG.PREP_METHODS);
+                const missionText = phrase('prep')(targetPrep);
+                if (missionText === lastMissionText) continue;
+                
                 mission = {
                     missionType: 'preparation',
-                    text: phrase('prep')(targetPrep),
+                    text: missionText,
                     targetPrep,
                     tags: ['preparation'],
                 };
@@ -441,9 +475,12 @@ export function getRandomMission() {
 
             case 'garnishOnly': {
                 const targetGarnish = randomItem(GARNISHES);
+                const missionText = phrase('garnish')(targetGarnish.name);
+                if (missionText === lastMissionText) continue;
+                
                 mission = {
                     missionType: 'garnishOnly',
-                    text: phrase('garnish')(targetGarnish.name),
+                    text: missionText,
                     targetGarnish: targetGarnish.name,
                     tags: ['garnish', targetGarnish.type.toLowerCase()],
                 };
@@ -452,9 +489,12 @@ export function getRandomMission() {
 
             case 'noType': {
                 const forbiddenTypes = getRandomTypes(1 + Math.floor(Math.random() * 2));
+                const missionText = phrase('noType')(forbiddenTypes);
+                if (missionText === lastMissionText) continue;
+                
                 mission = {
                     missionType: 'noType',
-                    text: phrase('noType')(forbiddenTypes),
+                    text: missionText,
                     forbiddenTypes,
                     tags: ['restriction'],
                 };
@@ -463,9 +503,12 @@ export function getRandomMission() {
 
             case 'exactCount': {
                 const targetCount = 1 + Math.floor(Math.random() * 4);
+                const missionText = phrase('exactCount')(targetCount);
+                if (missionText === lastMissionText) continue;
+                
                 mission = {
                     missionType: 'exactCount',
-                    text: phrase('exactCount')(targetCount),
+                    text: missionText,
                     targetCount,
                     tags: ['count'],
                 };
@@ -476,16 +519,32 @@ export function getRandomMission() {
                 // Fallback to mixed types mission
                 const count = 2 + Math.floor(Math.random() * (GAME_CONFIG.TYPES.length - 2));
                 const types = getRandomTypes(count);
+                const missionText = `Create a mostly ${types.map(t => t.toLowerCase()).join(' and ')} blend.`;
+                if (missionText === lastMissionText) continue;
+                
                 mission = {
                     missionType: 'mixedTypes',
-                    text: `Create a mostly ${types.map(t => t.toLowerCase()).join(' and ')} blend.`,
+                    text: missionText,
                     targetTypes: types,
                     tags: ['mixedTypes', ...types.map(t => t.toLowerCase())],
                 };
             }
         }
-    } while (!mission);
 
+        // If we've tried too many times, force a new mission
+        if (attempts >= maxAttempts && !mission) {
+            const cocktail = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
+            mission = {
+                missionType: 'cocktail',
+                text: `I'll have a "${cocktail.name}" please.`,
+                targetCocktail: cocktail,
+                difficulty: GAME_CONFIG.DIFFICULTY_MULTIPLIERS.EASY,
+                tags: ['cocktail', ...(cocktail.tags || []).map(t => t.toLowerCase())],
+            };
+        }
+    } while (!mission || mission.text === lastMissionText);
+
+    lastMissionText = mission.text;
     return mission;
 }
 
@@ -503,7 +562,8 @@ export function getRandomMission() {
 export function getScoreData(drinksServed = 0, currentMoney = 0, upgrades = {}) {
     // Base revenue calculations
     const basePrice = 20;
-    const moneyEarned = drinksServed * basePrice;
+    const drinkBonus = upgrades.drinkIncome ? 10 : 0; // +10 gold per drink with upgrade
+    const moneyEarned = drinksServed * (basePrice + drinkBonus);
 
     // Fixed daily expenses
     let rentCost = 60;

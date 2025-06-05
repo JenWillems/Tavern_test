@@ -34,7 +34,8 @@ export default function App() {
     
     // Bar-game state
     const [mixGlass, setMixGlass] = useState([]);
-    const [money, setMoney] = useState(INITIAL_DEBT);
+    const [money, setMoney] = useState(INITIAL_DEBT); // This now tracks debt
+    const [availableGold, setAvailableGold] = useState(0); // New state for available gold
     const [garnish, setGarnish] = useState(null);
     const [prepMethod, setPrepMethod] = useState(null);
     const [mission, setMission] = useState(() => getRandomMission());
@@ -43,21 +44,20 @@ export default function App() {
     const [day, setDay] = useState(1);
     const [showReport, setShowReport] = useState(false);
     const [gameOver, setGameOver] = useState(false);
-
-    // Move the useEffect after day state is initialized
-    useEffect(() => {
-        setMission(getRandomMission());
-    }, [day]);
-
-    const [score, setScore] = useState(0);
     const [timeLeft, setTimeLeft] = useState(120);
     const [drinksServed, setDrinksServed] = useState(0);
 
     // Cocktail-book
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [selectedCocktail, setSelectedCocktail] = useState(null);
+    const [activeTab, setActiveTab] = useState('cocktails');
 
     const progressRef = useRef();
+
+    // Move the useEffect after day state is initialized
+    useEffect(() => {
+        setMission(getRandomMission());
+    }, [day]);
 
     // Check for game over conditions
     useEffect(() => {
@@ -70,10 +70,25 @@ export default function App() {
         }
     }, [day, money]);
 
-    // 3) Handler to receive money updates from GameProgress
+    // Handler to receive money updates from GameProgress
     const handleMoneyChange = useCallback((amount) => {
-        setMoney(prevMoney => prevMoney + amount);
+        if (amount > 0) {
+            // When earning money, add it to available gold
+            setAvailableGold(prev => prev + amount);
+        } else {
+            // When spending money (negative amount), deduct from available gold
+            setAvailableGold(prev => Math.max(0, prev + amount));
+        }
     }, []);
+
+    // Handler for spending available gold (e.g., on upgrades)
+    const handleSpendGold = useCallback((amount) => {
+        if (amount <= availableGold) {
+            setAvailableGold(prev => prev - amount);
+            return true;
+        }
+        return false;
+    }, [availableGold]);
 
     // Timer effect: countdown unless report is showing
     useEffect(() => {
@@ -135,7 +150,6 @@ export default function App() {
             setShowSecretDiscovery(true);
             // Add extra points for discovering a secret recipe
             const secretBonus = 50;
-            setScore((s) => s + result.points + secretBonus);
             progressRef.current?.changeMoney(result.points + secretBonus);
             return;
         }
@@ -146,7 +160,6 @@ export default function App() {
                 ? `✅ Perfect ${result.drinkName}! Exactly what was ordered! +${result.points} gold.`
                 : `✅ Created ${result.drinkName}! +${result.points} gold.`;
             alert(message);
-            setScore((s) => s + result.points);
             setDrinksServed((n) => n + 1);
             progressRef.current?.changeMoney(result.points);
         }
@@ -155,14 +168,18 @@ export default function App() {
             const basePoints = 15; // Base points for any known cocktail
             const message = `✅ Perfect ${result.drinkName}! Not what was ordered, but still good! +${basePoints} gold.`;
             alert(message);
-            setScore((s) => s + basePoints);
             setDrinksServed((n) => n + 1);
             progressRef.current?.changeMoney(basePoints);
-        } else {
-            // If it's not a known recipe and doesn't match mission
-            alert(`❌ ${result.drinkName} - Not what was ordered. No gold awarded.`);
         }
+        // If it's not a known recipe at all
+        else {
+            alert('❌ That\'s not a drink anyone would want to order...');
+            return;
+        }
+
+        // Reset the mixing glass
         resetMix();
+        // Get a new mission
         setMission(getRandomMission());
     }, [mixGlass, mission, garnish, prepMethod, resetMix]);
 
@@ -172,39 +189,60 @@ export default function App() {
     }, []);
 
     // Next Day: hide report, reset bar, increment day
-    const handleNextDay = useCallback((newBalance) => {
+    const handleNextDay = useCallback((newDebt) => {
         setShowReport(false);
         setDay((d) => d + 1);
         setTimeLeft(120);
         resetMix();
         setMission(getRandomMission());
         setDrinksServed(0);
-        setMoney(typeof newBalance === 'number' ? newBalance : 0);
+        // Update debt but keep available gold
+        setMoney(newDebt);
     }, [resetMix]);
 
     // Upgrades & fridge from sidebar
-    const handleUpgrade = useCallback((type) => {
+    const handleUpgrade = useCallback((type, amount) => {
+        let cost = 0;
         switch(type) {
             case 'extraTime':
-                setTimeLeft(prev => prev + 60); // Add 60 seconds
+                cost = 1000;
+                if (handleSpendGold(cost)) {
+                    setTimeLeft(prev => prev + 60);
+                }
                 break;
             case 'debtReduction':
-                // Debt reduction is handled in FinanceReport
+                cost = 2000;
+                if (handleSpendGold(cost)) {
+                    setMoney(prev => Math.min(0, Math.floor(prev * 0.95))); // 5% debt reduction
+                }
                 break;
             case 'costReduction':
-                // Cost reduction is handled in GameLogic
+                cost = 1500;
+                handleSpendGold(cost);
                 break;
             case 'meadFridge':
-                // Mead fridge is already handled
+                cost = 3000;
+                handleSpendGold(cost);
+                break;
+            case 'drinkIncome':
+                cost = 1000;
+                handleSpendGold(cost);
+                break;
+            case 'payDebt':
+                // amount parameter is how much gold to apply to debt
+                if (amount > 0) {
+                    setMoney(prev => Math.min(0, prev + amount));
+                }
                 break;
         }
-    }, []);
+    }, [handleSpendGold, setTimeLeft]);
 
     const handleUseFridge = useCallback(() => {
-        progressRef.current?.changeMoney();
-        resetMix();
-        setMission(getRandomMission());
-    }, [resetMix]);
+        if (handleSpendGold(50)) { // Fridge usage cost
+            resetMix();
+            setMission(getRandomMission());
+        }
+    }, [resetMix, handleSpendGold]);
 
     // Cocktail book filtering
     const toggleFilter = useCallback((filter) => {
@@ -232,9 +270,6 @@ export default function App() {
         setSelectedFilters([]);
         setSelectedCocktail(null);
     }, []);
-
-    // Add state for active book tab
-    const [activeTab, setActiveTab] = useState('cocktails');
 
     return (
         <div className="container">
@@ -350,7 +385,7 @@ export default function App() {
                     </div>
 
                     {/* Score & timer */}
-                    <ScoreTime score={score} timeLeft={timeLeft} />
+                    <ScoreTime timeLeft={timeLeft} />
 
                     {/* Finish day */}
                     <button
@@ -446,6 +481,7 @@ export default function App() {
                                 onUseFridge={handleUseFridge}
                                 onMoneyChange={handleMoneyChange}
                                 totalMoney={money}
+                                availableGold={availableGold}
                                 isBookView={true}
                             />
                             <span className="page-number page-number-left">1</span>
@@ -459,6 +495,7 @@ export default function App() {
                 day={day} 
                 drinksServed={drinksServed} 
                 currentMoney={money}
+                availableGold={availableGold}
                 upgrades={progressRef.current?.upgrades || {}}
                 onNextDay={handleNextDay} 
             />}

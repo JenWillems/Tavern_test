@@ -183,8 +183,8 @@ export const cocktailRecipes = [
         tags: ['Secret'],
     },
     {
-        name: 'Billy’s Seed',
-        ingredients: ['Strong','Herbal','Herbal','Sweet'],
+        name: "Billy's Seed",
+        ingredients: ['Firewater', 'Herbal', 'Herbal', 'Honey'],
         garnishes: LEMON_TWIST,
         serving: STIRRED,
         notes: 'Like a brain rot sing-along — endlessly bitter, a little confusing, and somehow impossible to stop repeating',
@@ -192,10 +192,10 @@ export const cocktailRecipes = [
     },
     {
         name: 'Flaming Gimp',
-        ingredients: ['Strong','Strong','Strong','Sweet'],
+        ingredients: ['Firewater', 'Firewater', 'Firewater', 'Honey'],
         garnishes: CHILI_FLAKE,
         serving: POURED,
-        notes: 'A true cocktail for the masochist. It hurts. You’ll be ask for more.',
+        notes: "A true cocktail for the masochist. It hurts. You'll be ask for more.",
         tags: ['Secret'],
     },
 ];
