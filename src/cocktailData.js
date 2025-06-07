@@ -198,4 +198,12 @@ export const cocktailRecipes = [
         notes: "A true cocktail for the masochist. It hurts. You'll be ask for more.",
         tags: ['Secret'],
     },
+    {
+        name: 'FIREBALL',
+        ingredients: ['Firewater', 'Berry', 'Firewater', 'Berry'],
+        garnishes: CHILI_FLAKE,
+        serving: STIRRED,
+        notes: "Doesnt matter how big the room i cast fireball",
+        tags: ['Secret'],
+    },
 ];

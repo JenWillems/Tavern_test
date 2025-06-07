@@ -8,7 +8,7 @@ import { cocktailRecipes } from './cocktailData';
 
 import GameProgress from './components/GameProgress';
 import MissionDisplay from './components/MissionDisplay';
-import ScoreTime from './components/ScoreTime';
+import Clock from './components/Clock';
 import FinanceReport from './components/FinanceReport';
 import LorePopup from './components/LorePopup';
 import SecretDiscoveryPopup from './components/SecretDiscoveryPopup';
@@ -385,7 +385,7 @@ export default function App() {
                     </div>
 
                     {/* Score & timer */}
-                    <ScoreTime timeLeft={timeLeft} />
+                    <Clock timeLeft={timeLeft} />
 
                     {/* Finish day */}
                     <button
