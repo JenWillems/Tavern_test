@@ -102,7 +102,7 @@ const generateDrinkName = (ingredients, prepMethod = null, garnish = null) => {
     // First check if it matches any known cocktail recipe exactly
     const matchingCocktail = cocktailRecipes.find(recipe => {
         const recipeIngs = [...recipe.ingredients].sort();
-        const drinkIngs = ingredients.map(i => i.name).sort();
+        const drinkIngs = [...ingredients].map(i => i.name).sort();
         
         const ingredientsMatch = recipeIngs.length === drinkIngs.length &&
             recipeIngs.every((v, i) => v === drinkIngs[i]);
@@ -143,7 +143,7 @@ const generateDrinkName = (ingredients, prepMethod = null, garnish = null) => {
     
     // Add garnish if specified and include its type
     if (garnish?.name) {
-        name += ` with ${garnish.name} (${garnish.type})`;
+        name += ` with ${garnish.name}`;
     }
 
     return {

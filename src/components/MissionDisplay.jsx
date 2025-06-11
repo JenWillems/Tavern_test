@@ -8,6 +8,21 @@ import React from 'react';
  * @param {Object} props.mission - Current mission data
  */
 export default function MissionDisplay({ mission }) {
+    // Handle loading state or no mission
+    if (!mission) {
+        return (
+            <div className="mission-display">
+                <div className="corner corner-tl"></div>
+                <div className="corner corner-tr"></div>
+                <div className="corner corner-bl"></div>
+                <div className="corner corner-br"></div>
+                
+                <div className="mission-header">Current Order</div>
+                <p>Loading mission...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="mission-display">
             <div className="corner corner-tl"></div>
@@ -16,7 +31,7 @@ export default function MissionDisplay({ mission }) {
             <div className="corner corner-br"></div>
             
             <div className="mission-header">Current Order</div>
-            <p>{mission?.text || 'Loading mission...'}</p>
+            <p>{typeof mission === 'string' ? mission : mission.text}</p>
         </div>
     );
 } 

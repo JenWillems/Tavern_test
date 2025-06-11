@@ -1,4 +1,5 @@
 import React from 'react';
+import './SecretDiscoveryPopup.css';
 
 /**
  * SecretDiscoveryPopup Component
@@ -33,7 +34,7 @@ export default function SecretDiscoveryPopup({ discoveredSecret, onClose, resetM
                         <iframe
                             width="800"
                             height="315"
-                            src="https://www.youtube.com/embed/ssOLDdXDUjQ?autoplay=1&modestbranding=1&controls=0"
+                            src="https://www.youtube.com/embed/ssOLDdXDUjQ?autoplay=1&modestbranding=1&controls=0&loop=1&playlist=ssOLDdXDUjQ"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen

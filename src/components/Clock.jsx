@@ -6,8 +6,10 @@ import React from 'react';
  * 
  * @param {Object} props
  * @param {number} props.timeLeft - Time remaining in seconds
+ * @param {number} props.day - Current day number
+ * @param {number} props.totalDays - Total number of days in the game
  */
-export default function Clock({ timeLeft }) {
+export default function Clock({ timeLeft, day, totalDays = 30 }) {
     // Convert timeLeft to minutes and seconds for the hands
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -21,13 +23,16 @@ export default function Clock({ timeLeft }) {
 
     return (
         <div className="clock-container">
+            <div className="day-counter">
+                Day {day} of {totalDays}
+            </div>
             <div className="clock">
                 <div className="clock-face">
                     {/* Clock numbers */}
                     {[...Array(12)].map((_, i) => {
                         const number = i === 0 ? '12' : i;
                         const angle = (i * 30) * (Math.PI / 180); // Convert to radians
-                        const radius = 35; // Distance from center
+                        const radius = 42; // Increased distance from center
                         
                         // Calculate x and y positions using trigonometry
                         const x = Math.sin(angle) * radius;
