@@ -1,0 +1,293 @@
+.bar-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: #2b1810;
+    background-image: url('../assets/wallpaper.png');
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Speech bubble styles */
+.speech-bubble {
+    position: absolute;
+    top: 15%;
+    left: 20%;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    min-width: 150px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Character/Mug styles */
+.character {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    z-index: 2;
+}
+
+.mug-character {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Bottom shelf styles */
+.bottom-shelf {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background-color: #5c3824;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+/* Bottles styles */
+.bottles-shelf {
+    position: absolute;
+    bottom: 60px;
+    left: 20px;
+    display: flex;
+    gap: 30px;
+}
+
+.bottle-button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 60px;
+    height: 90px;
+    transition: transform 0.2s, filter 0.2s;
+    position: relative;
+}
+
+.bottle-button:hover {
+    transform: scale(1.1);
+}
+
+.bottle-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.bottle-button.selected {
+    filter: drop-shadow(0 0 8px #ffd700);
+}
+
+/* Garnishes styles */
+.garnishes-container {
+    position: absolute;
+    bottom: 60px;
+    right: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 15px;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+.garnish-button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    transition: transform 0.2s, filter 0.2s;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.garnish-button:hover {
+    transform: scale(1.1);
+}
+
+.garnish-button.selected {
+    filter: drop-shadow(0 0 6px #ffd700);
+}
+
+.garnish-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Honey container styles */
+.honey-container {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+}
+
+.honey-jar {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Base button styles */
+.button-base {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    min-width: 180px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin: 5px;
+    position: relative;
+}
+
+/* Drink specific styles */
+.drink-button {
+    background: linear-gradient(to bottom, #8b5e3c 0%, #6b4423 100%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.drink-button:hover {
+    background: linear-gradient(to bottom, #9b6e4c 0%, #7b5433 100%);
+}
+
+.drink-button.selected {
+    background: linear-gradient(to bottom, #a17b59 0%, #8c6540 100%);
+    box-shadow: 0 0 8px #ffd700;
+}
+
+.drink-icon {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Garnish specific styles */
+.garnish-button {
+    background: linear-gradient(to bottom, #6b4423 0%, #513219 100%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.garnish-button:hover {
+    background: linear-gradient(to bottom, #7b5433 0%, #614229 100%);
+}
+
+.garnish-button.selected {
+    background: linear-gradient(to bottom, #8c6540 0%, #725339 100%);
+    box-shadow: 0 0 8px #ffd700;
+}
+
+.garnish-icon {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Text content styles */
+.ingredient-name {
+    color: #e6d5c3;
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 40px; /* Space for icon */
+}
+
+.ingredient-type {
+    background-color: #2b1810;
+    color: #8b5e3c;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.selected .ingredient-type {
+    background-color: #3b2820;
+    color: #ffd700;
+}
+
+/* Container layouts */
+.drinks-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 20px;
+    position: absolute;
+    top: 20px;
+    width: 100%;
+}
+
+.garnishes-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 20px;
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+}
+
+/* Specific drink icons - based on type */
+.strong-drink {
+    background-image: url('../assets/Strong_bottle.png');
+}
+
+.sour-drink {
+    background-image: url('../assets/Sour_bottle.png');
+}
+
+.bitter-drink {
+    background-image: url('../assets/Herbal_bottle.png');
+}
+
+.sweet-drink {
+    background-image: url('../assets/Sweet_bottle.png');
+}
+
+/* Specific garnish icons */
+.mint-icon {
+    background-image: url('../assets/Mint_leaf.png');
+}
+
+.lemon-icon {
+    background-image: url('../assets/Lemon.png');
+}
+
+.sugar-icon {
+    background-image: url('../assets/Sugar.png');
+}
+
+.chili-icon {
+    background-image: url('../assets/Chili_flakes.png');
+} 
