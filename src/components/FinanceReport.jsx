@@ -14,7 +14,7 @@ import React from 'react';
  * @param {Function} props.onNextDay - Function to handle next day
  */
 export default function FinanceReport({ day, drinksServed, currentMoney, availableGold, upgrades, onNextDay }) {
-    // Calculate daily costs and income
+    // Calculate daily costs
     const foodCost = -8;  // Daily food cost (matches GameLogic)
     const rentCost = -60; // Daily rent cost (matches GameLogic)
     const boozeCost = -Math.max(12, Math.floor(drinksServed * 5)); // Dynamic booze cost based on drinks (matches GameLogic)
@@ -25,34 +25,30 @@ export default function FinanceReport({ day, drinksServed, currentMoney, availab
         totalDailyCosts = Math.floor(totalDailyCosts * 0.85); // 15% reduction
     }
     
-    const basePrice = 20;
-    const drinkBonus = upgrades.drinkIncome ? 10 : 0; // +10 gold per drink with upgrade
-    const drinksIncome = drinksServed * (basePrice + drinkBonus);
-    const totalChange = drinksIncome + totalDailyCosts;
-    
     // Calculate new debt and available gold
     let newDebt = currentMoney;
     let newAvailableGold = availableGold;
     
-    if (totalChange > 0) {
-        // If we made profit, keep it as available gold
-        newAvailableGold += totalChange;
+    // Apply daily costs to available gold first
+    if (newAvailableGold >= Math.abs(totalDailyCosts)) {
+        // If we have enough gold, just subtract the costs
+        newAvailableGold += totalDailyCosts;
     } else {
-        // If we lost money, first use available gold
-        if (newAvailableGold >= Math.abs(totalChange)) {
-            newAvailableGold += totalChange; // Subtract the loss from available gold
-        } else {
-            // If we don't have enough available gold, the rest goes to debt
-            const remainingLoss = totalChange + newAvailableGold; // This will be negative
-            newDebt += remainingLoss;
-            newAvailableGold = 0;
-        }
+        // If we don't have enough gold, the remainder goes to debt
+        const remainingCosts = totalDailyCosts + newAvailableGold; // This will be negative
+        newDebt += remainingCosts;
+        newAvailableGold = 0;
     }
 
     // Apply debt reduction if the upgrade is purchased
     if (upgrades.debtReduction && newDebt < 0) {
         newDebt = Math.min(0, Math.floor(newDebt * 0.95)); // 5% debt reduction
     }
+
+    // Calculate display values for income (already added to availableGold during the day)
+    const basePrice = 20;
+    const drinkBonus = upgrades.drinkIncome ? 10 : 0;
+    const drinksIncome = drinksServed * (basePrice + drinkBonus);
 
     return (
         <div className="finance-report-overlay">
@@ -92,29 +88,30 @@ export default function FinanceReport({ day, drinksServed, currentMoney, availab
                         <strong className="negative">{foodCost}g</strong>
                     </div>
                     <div className="finance-row">
-                        <span>Booze:</span>
-                        <strong className="negative">{boozeCost}g</strong>
-                    </div>
-                    <div className="finance-row">
                         <span>Rent:</span>
                         <strong className="negative">{rentCost}g</strong>
                     </div>
-                    <div className="finance-row total">
-                        <span>Total Expenses:</span>
+                    <div className="finance-row">
+                        <span>Booze:</span>
+                        <strong className="negative">{boozeCost}g</strong>
+                    </div>
+                    {upgrades.costReduction && (
+                        <div className="finance-row cost-reduction">
+                            <span>Cost Reduction:</span>
+                            <strong className="positive">15% off</strong>
+                        </div>
+                    )}
+                    <div className="finance-row total-costs">
+                        <span>Total Costs:</span>
                         <strong className="negative">{totalDailyCosts}g</strong>
-                        {upgrades.costReduction && (
-                            <small className="cost-reduction">(15% reduction applied)</small>
-                        )}
                     </div>
                 </div>
 
                 <div className="finance-section">
                     <h3>End of Day Summary</h3>
                     <div className="finance-row">
-                        <span>Daily Net:</span>
-                        <strong className={totalChange >= 0 ? 'positive' : 'negative'}>
-                            {totalChange >= 0 ? '+' : ''}{totalChange}g
-                        </strong>
+                        <span>Daily Costs:</span>
+                        <strong className="negative">{totalDailyCosts}g</strong>
                     </div>
                     <div className="finance-row">
                         <span>New Available Gold:</span>
@@ -140,7 +137,7 @@ export default function FinanceReport({ day, drinksServed, currentMoney, availab
 
                 <button 
                     className="button button-gold"
-                    onClick={() => onNextDay(newDebt)}
+                    onClick={() => onNextDay(newDebt, newAvailableGold)}
                 >
                     Next Day
                 </button>

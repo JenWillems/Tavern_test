@@ -1,19 +1,27 @@
 import React, { useState } from 'react';
 import './Bar.css';
-import mugImage from '../assets/mug_mostly_honey.png';
+// Import all mug images
+import mugHoney from '../assets/Mugs/mug_mostly_honey.png';
+import mugBerry from '../assets/Mugs/mug_mostly_berry.png';
+import mugFirewater from '../assets/Mugs/mug_mostly_firewater.png';
+import mugHerbal from '../assets/Mugs/mug_mostly_herbal.png';
 import { cocktailRecipes } from '../cocktailData';
 
 // Import bottle images
-import strongBottle from '../assets/Strong_bottle.png';
-import sourBottle from '../assets/Sour_bottle.png';
-import herbalBottle from '../assets/Herbal_bottle.png';
-import sweetBottle from '../assets/Sweet_bottle.png';
+import strongBottle from '../assets/Bottles/Strong_bottle.png';
+import sourBottle from '../assets/Bottles/Sour_bottle.png';
+import herbalBottle from '../assets/Bottles/Herbal_bottle.png';
+import sweetBottle from '../assets/Bottles/Sweet_bottle.png';
 
 // Import garnish images
-import mintLeaf from '../assets/Mint_leaf.png';
-import lemon from '../assets/Lemon.png';
-import chiliFlakes from '../assets/Chili_flakes.png';
-import sugar from '../assets/Sugar.png';
+import mintLeaf from '../assets/Garnishes/Mint_leaf.png';
+import lemon from '../assets/Garnishes/Lemon.png';
+import chiliFlakes from '../assets/Garnishes/Chili_flakes.png';
+import sugar from '../assets/Garnishes/Sugar.png';
+
+// Import plank images
+import plankBottles from '../assets/plank_bottles.png';
+import plankGarnishes from '../assets/plank_garnishes.png';
 
 const DRINKS = [
     { name: 'Firewater', type: 'Strong', class: 'button-firewater', image: strongBottle },
@@ -28,6 +36,14 @@ const GARNISHES = [
     { name: 'Chili Flake', type: 'Strong', image: chiliFlakes },
     { name: 'Sugar Rim', type: 'Sweet', image: sugar }
 ];
+
+// Mug mapping based on ingredient type
+const MUG_IMAGES = {
+    'Firewater': mugFirewater,
+    'Berry': mugBerry,
+    'Herbal': mugHerbal,
+    'Honey': mugHoney
+};
 
 const SERVING_OPTIONS = ['Stirred', 'Shaken', 'Poured'];
 const TASTE_FILTERS = ['Sweet', 'Bitter', 'Strong', 'Sour'];
@@ -48,6 +64,8 @@ function Bar({
     const [activeTab, setActiveTab] = useState('cocktails');
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [selectedCocktail, setSelectedCocktail] = useState(null);
+    const [currentMug, setCurrentMug] = useState(mugHoney); // Default mug
+    const [dumpDrinkUses, setDumpDrinkUses] = useState(3); // Track dump drink uses
 
     const handleIngredientClick = (drink) => {
         if (selectedIngredients.length < 4) {
@@ -68,7 +86,22 @@ function Bar({
     };
 
     const handleServe = () => {
+        // Determine the dominant ingredient
+        const ingredientCounts = {};
+        selectedIngredients.forEach(ing => {
+            ingredientCounts[ing.name] = (ingredientCounts[ing.name] || 0) + 1;
+        });
+        
+        // Find the ingredient with the highest count
+        let dominantIngredient = Object.entries(ingredientCounts)
+            .sort(([,a], [,b]) => b - a)[0][0];
+        
+        // Update the mug image based on the dominant ingredient
+        setCurrentMug(MUG_IMAGES[dominantIngredient] || mugHoney);
+        
+        // Call the original onServeDrink
         onServeDrink(selectedIngredients, selectedGarnish, selectedServing);
+        
         // Reset selections
         setSelectedIngredients([]);
         setSelectedGarnish(null);
@@ -81,13 +114,26 @@ function Bar({
         );
     };
 
-    const filteredCocktails = cocktailRecipes.filter(cocktail => {
-        if (cocktail.tags?.includes('Secret') && !discoveredSecrets.includes(cocktail.name)) {
-            return false;
-        }
-        if (selectedFilters.length === 0) return true;
-        return cocktail.tags?.some(tag => selectedFilters.includes(tag));
-    });
+    const handleDumpDrink = () => {
+        setSelectedIngredients([]);
+        setSelectedGarnish(null);
+        setSelectedServing(null);
+        setDumpDrinkUses(prev => prev - 1);
+    };
+
+    const clearFilters = () => {
+        setSelectedFilters([]);
+    };
+
+    const filteredCocktails = cocktailRecipes
+        .filter(cocktail => {
+            if (cocktail.tags?.includes('Secret') && !discoveredSecrets.includes(cocktail.name)) {
+                return false;
+            }
+            if (selectedFilters.length === 0) return true;
+            return cocktail.tags?.some(tag => selectedFilters.includes(tag));
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     const canServe = selectedIngredients.length > 0 && selectedServing !== null;
 
@@ -99,7 +145,7 @@ function Bar({
                     <p>{typeof currentMission === 'string' ? currentMission : currentMission?.text || 'Loading...'}</p>
                 </div>
                 <div className="character">
-                    <img src={mugImage} alt="Mug Character" />
+                    <img src={currentMug} alt="Mug Character" className="mug-image" />
                 </div>
                 {upgrades.meadFridge && (
                     <button 
@@ -142,6 +188,14 @@ function Bar({
                                         {filter}
                                     </button>
                                 ))}
+                                {selectedFilters.length > 0 && (
+                                    <button
+                                        className="filter-button clear-filters"
+                                        onClick={clearFilters}
+                                    >
+                                        Clear Filters
+                                    </button>
+                                )}
                             </div>
                             <div className="cocktail-list">
                                 {filteredCocktails.map(cocktail => (
@@ -245,52 +299,24 @@ function Bar({
                         </div>
                     )}
                 </div>
-
-                {/* Mixing Area - Yellow */}
-                <div className="mixing-area">
-                    <div className="selected-ingredients">
-                        {selectedIngredients.map((ingredient, index) => (
-                            <div key={index} className="selected-ingredient">
-                                <span>{ingredient.name}</span>
-                                <button onClick={() => removeIngredient(index)}>×</button>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="serving-options">
-                        {SERVING_OPTIONS.map(option => (
-                            <button
-                                key={option}
-                                className={`serving-option ${selectedServing === option ? 'selected' : ''}`}
-                                onClick={() => handleServingClick(option)}
-                            >
-                                {option}
-                            </button>
-                        ))}
-                    </div>
-
-                    <button 
-                        className="serve-button"
-                        onClick={handleServe}
-                        disabled={!canServe}
-                    >
-                        Serve Drink
-                    </button>
-                </div>
             </div>
 
-            {/* Ingredients Section - Red */}
+            {/* Ingredients Section */}
             <div className="ingredients-section">
                 <div className="bottles-shelf">
                     {DRINKS.map((drink) => (
                         <button
                             key={drink.name}
-                            className={`button-mix ${drink.class}`}
+                            className={`button-mix ${selectedIngredients.includes(drink) ? 'selected' : ''}`}
                             onClick={() => handleIngredientClick(drink)}
                             disabled={selectedIngredients.length >= 4}
+                            title={`${drink.name} (${drink.type})`}
                         >
-                            {drink.name}
-                            <span className="ingredient-tag">{drink.type}</span>
+                            <img 
+                                src={drink.image} 
+                                alt={drink.name} 
+                                className="ingredient-image"
+                            />
                         </button>
                     ))}
                 </div>
@@ -298,15 +324,65 @@ function Bar({
                     {GARNISHES.map((garnish) => (
                         <button
                             key={garnish.name}
-                            className={`button-mix ${
-                                selectedGarnish === garnish ? 'selected' : ''
-                            }`}
+                            className={`button-mix ${selectedGarnish === garnish ? 'selected' : ''}`}
                             onClick={() => handleGarnishClick(garnish)}
+                            title={`${garnish.name} (${garnish.type})`}
                         >
-                            {garnish.name}
-                            <span className="ingredient-tag">{garnish.type}</span>
+                            <img 
+                                src={garnish.image} 
+                                alt={garnish.name} 
+                                className="garnish-image"
+                            />
                         </button>
                     ))}
+                </div>
+            </div>
+
+            {/* Mixing Area */}
+            <div className="mixing-area">
+                <div className="selected-ingredients">
+                    {selectedIngredients.map((ingredient, index) => (
+                        <div key={index} className="selected-ingredient">
+                            <span>{ingredient.name}</span>
+                            <button onClick={() => removeIngredient(index)}>&times;</button>
+                        </div>
+                    ))}
+                    {selectedGarnish && (
+                        <div className="selected-ingredient">
+                            <span>{selectedGarnish.name}</span>
+                            <button onClick={() => setSelectedGarnish(null)}>&times;</button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="serving-options">
+                    {SERVING_OPTIONS.map(option => (
+                        <button
+                            key={option}
+                            className={`serving-option ${selectedServing === option ? 'selected' : ''}`}
+                            onClick={() => handleServingClick(option)}
+                        >
+                            {option}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="action-buttons">
+                    <button
+                        className="serve-button"
+                        onClick={handleServe}
+                        disabled={!canServe}
+                    >
+                        Serve Drink
+                    </button>
+                    {selectedIngredients.length > 0 && dumpDrinkUses > 0 && (
+                        <button
+                            className="dump-button"
+                            onClick={handleDumpDrink}
+                        >
+                            Dump Drink ({dumpDrinkUses})
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

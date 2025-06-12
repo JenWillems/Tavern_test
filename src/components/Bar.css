@@ -3,7 +3,7 @@
     height: 100vh;
     display: grid;
     grid-template-columns: minmax(600px, 1fr) minmax(250px, 400px);
-    grid-template-rows: minmax(300px, 555px) 1fr;
+    grid-template-rows: minmax(300px, 555px) 1fr auto;
     gap: 4px;
     background-color: #000;
     padding: 4px;
@@ -60,8 +60,12 @@
 /* Book Section - Blue */
 .book-section {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1;
     background-color: #3b2820;
+    background-image: url('../assets/book-background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
     border: 4px solid #0000ff;
     display: flex;
     flex-direction: column;
@@ -284,45 +288,47 @@
     display: flex;
     padding: 15px;
     gap: 15px;
-    background-image: url('../assets/plank_bottles.png');
+    background-image: url('../assets/bar_background.png');
     background-size: cover;
     height: 300px;
     position: relative;
 }
 
 .bottles-shelf {
-    flex: 3;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+    background: url('../assets/plank_bottles.png') no-repeat center;
+    background-size: contain;
+    min-height: 200px;
 }
 
 .garnishes-shelf {
-    flex: 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: flex-end;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+    background: url('../assets/plank_garnishes.png') no-repeat center;
+    background-size: contain;
+    min-height: 300px;
+    place-items: center;
 }
 
-/* Mixing Area - Yellow */
+/* Mixing Area - Blue */
 .mixing-area {
-    background: var(--panel-bg);
-    padding: 1rem;
+    grid-column: 2;
+    grid-row: 2;
+    background: rgba(43, 24, 16, 0.9);
+    padding: 20px;
     border-radius: 8px;
-    border: 1px solid var(--gold-dark);
-    width: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: auto; /* Push to the bottom of book section */
-    position: sticky;
-    bottom: 0;
-    background-color: #2b1810; /* Match the theme */
-    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for separation */
+    border: 2px solid #0000ff;
+    margin-top: 20px;
 }
 
 .mixing-area h3 {
@@ -351,47 +357,54 @@
 
 .selected-ingredients {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
 .selected-ingredient {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(212, 175, 55, 0.1);
-    padding: 0.5rem;
+    background: rgba(166, 124, 82, 0.2);
+    padding: 8px 12px;
     border-radius: 4px;
-    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid var(--gold-dark);
 }
 
 .selected-ingredient button {
     background: none;
     border: none;
-    color: var(--paper);
-    font-size: 1.2rem;
+    color: var(--gold);
     cursor: pointer;
-    padding: 0 0.5rem;
+    padding: 0 5px;
+    font-size: 1.2em;
 }
 
 .selected-ingredient button:hover {
-    color: var(--gold);
+    color: var(--gold-light);
 }
 
 .serving-options {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
 .serving-option {
-    background: var(--panel-bg);
-    color: var(--paper);
+    background: rgba(166, 124, 82, 0.1);
     border: 1px solid var(--gold-dark);
-    padding: 0.5rem;
+    color: var(--paper);
+    padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+.serving-option:hover {
+    background: rgba(166, 124, 82, 0.2);
 }
 
 .serving-option.selected {
@@ -399,96 +412,50 @@
     color: var(--dark);
 }
 
-.serving-option:hover:not(.selected) {
-    border-color: var(--gold);
-    color: var(--gold);
-}
-
-.serve-button {
-    background: var(--gold);
-    color: var(--dark);
-    border: none;
-    padding: 0.8rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: all 0.2s ease;
-}
-
-.serve-button:hover:not(:disabled) {
-    background: var(--gold-light);
-    transform: translateY(-2px);
-}
-
-.serve-button:disabled {
-    background: #666;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
 /* Button Styles */
 .button-mix {
-    width: clamp(90px, 15vw, 120px);
-    height: clamp(120px, 20vh, 160px);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
-    padding: 10px;
-    background: linear-gradient(to bottom, #5a463e, #3b2820);
-    border: none;
-    color: #f5e6d3;
-    cursor: pointer;
+    transition: transform 0.2s ease;
     position: relative;
-    font-size: 0.9em;
-}
-
-.button-mix::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 20px;
-    transform: translateX(-50%);
-    width: clamp(48px, 8vw, 64px);
-    height: clamp(48px, 8vw, 64px);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-/* Specific drink button images */
-.button-firewater::before {
-    background-image: url('../assets/Strong_bottle.png');
-}
-
-.button-berry::before {
-    background-image: url('../assets/Sour_bottle.png');
-}
-
-.button-herbal::before {
-    background-image: url('../assets/Herbal_bottle.png');
-}
-
-.button-honey::before {
-    background-image: url('../assets/Sweet_bottle.png');
-}
-
-.ingredient-tag {
-    margin-top: 5px;
-    padding: clamp(2px, 0.5vw, 4px) clamp(4px, 1vw, 8px);
-    background: #2b1810;
-    color: #8b5e3c;
-    font-size: clamp(0.7em, 0.9vw, 0.9em);
-    border-radius: 4px;
-}
-
-.button-mix.selected {
-    background: linear-gradient(to bottom, #8b5e3c, #5a463e);
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 .button-mix:hover {
-    background: linear-gradient(to bottom, #6a564e, #4b3830);
+    transform: translateY(-5px);
+}
+
+.button-mix:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ingredient-image {
+    width: 200px;
+    height: 250px;
+    object-fit: contain;
+    transition: filter 0.2s ease;
+}
+
+.garnish-image {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    transition: filter 0.2s ease;
+}
+
+.button-mix.selected .ingredient-image,
+.button-mix.selected .garnish-image {
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+}
+
+.ingredient-tag {
+    display: none;
 }
 
 /* Media Queries for smaller screens */
@@ -496,16 +463,12 @@
     .bar-container {
         grid-template-columns: 1fr 250px;
     }
-
-    .mixing-area {
-        right: 270px;
-    }
 }
 
 @media (max-width: 768px) {
     .bar-container {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
+        grid-template-rows: auto auto auto auto;
     }
 
     .book-section {
@@ -519,9 +482,9 @@
     }
 
     .mixing-area {
-        position: fixed;
-        right: 4px;
-        width: 200px;
+        grid-column: 1;
+        grid-row: 4;
+        margin: 20px 4px;
     }
 }
 
@@ -629,8 +592,8 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
     transition: transform 0.2s, filter 0.2s;
     border-radius: 5px;
     display: flex;
@@ -843,4 +806,84 @@
 .gold-amount, .debt-amount {
     font-size: 1.1rem;
     font-weight: bold;
+}
+
+.mug-image {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+}
+
+.ingredient-image {
+    width: 150px;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+.garnish-image {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+.plank-image {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    z-index: 0;
+}
+
+.bottles-plank {
+    top: 0;
+}
+
+.garnishes-plank {
+    bottom: 0;
+}
+
+.bottles-shelf,
+.garnishes-shelf {
+    position: relative;
+    z-index: 1;
+}
+
+.clear-filters {
+    background: var(--panel-bg);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold);
+}
+
+.clear-filters:hover {
+    background: rgba(166, 124, 82, 0.2);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.dump-button {
+    background: #8B0000;
+    color: var(--paper);
+    border: none;
+    padding: 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+}
+
+.dump-button:hover {
+    background: #A00000;
+    transform: translateY(-2px);
+}
+
+.dump-button:disabled {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 0.7;
 } 

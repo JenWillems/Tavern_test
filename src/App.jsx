@@ -11,6 +11,7 @@ import Clock from './components/Clock';
 import LorePopup from './components/LorePopup';
 import SecretDiscoveryPopup from './components/SecretDiscoveryPopup';
 import GameOverScreen from './components/GameOverScreen';
+import FinanceReport from './components/FinanceReport';
 
 const INITIAL_DEBT = -20000; // Starting debt
 const MAX_DAYS = 30; // Days until eviction
@@ -27,6 +28,10 @@ export default function App() {
     const [discoveredSecrets, setDiscoveredSecrets] = useState([]);
     const [showSecretPopup, setShowSecretPopup] = useState(false);
     const [lastDiscoveredSecret, setLastDiscoveredSecret] = useState(null);
+    const [mixingGlass, setMixingGlass] = useState([]);
+    const [selectedGarnish, setSelectedGarnish] = useState(null);
+    const [servingMethod, setServingMethod] = useState(null);
+    const [showFinanceReport, setShowFinanceReport] = useState(false);
 
     // Upgrades state
     const [upgrades, setUpgrades] = useState({
@@ -77,11 +82,17 @@ export default function App() {
 
     // Handle day end
     const handleDayEnd = useCallback(() => {
-        const { newBalance } = getScoreData(drinksServed, money, upgrades);
-        setMoney(newBalance);
-        setDrinksServed(0);
+        setShowFinanceReport(true);
+    }, []);
 
-        if (day >= MAX_DAYS || newBalance >= 0) {
+    // Handle finance report next day
+    const handleNextDay = useCallback((newDebt, newAvailableGold) => {
+        setMoney(newDebt);
+        setAvailableGold(newAvailableGold);
+        setDrinksServed(0);
+        setShowFinanceReport(false);
+
+        if (day >= MAX_DAYS || newDebt >= 0) {
             setGameOver(true);
         } else {
             setDay(prev => prev + 1);
@@ -90,7 +101,7 @@ export default function App() {
                 clockRef.current.resetTimer();
             }
         }
-    }, [day, drinksServed, money, upgrades]);
+    }, [day]);
 
     // Handle upgrades
     const handleUpgrade = useCallback((type, amount = 0) => {
@@ -127,6 +138,7 @@ export default function App() {
         setDrinksServed(0);
         setGameOver(false);
         setDiscoveredSecrets([]);
+        setShowFinanceReport(false);
         setUpgrades({
             extraTime: false,
             debtReduction: false,
@@ -160,6 +172,17 @@ export default function App() {
                 />
             )}
 
+            {showFinanceReport && (
+                <FinanceReport
+                    day={day}
+                    drinksServed={drinksServed}
+                    currentMoney={money}
+                    availableGold={availableGold}
+                    upgrades={upgrades}
+                    onNextDay={handleNextDay}
+                />
+            )}
+
             {gameOver ? (
                 <GameOverScreen
                     finalMoney={money}
@@ -174,6 +197,7 @@ export default function App() {
                         onDayEnd={handleDayEnd}
                         extraTime={upgrades.extraTime}
                         day={day}
+                        totalDays={MAX_DAYS}
                     />
 
                     <Bar

@@ -1892,9 +1892,8 @@ body {
 /* Antique Clock Styles */
 .clock-container {
     position: fixed;
-    top: 50%;
+    top: 20px;
     left: 20px;
-    transform: translateY(-50%);
     z-index: 100;
     padding: 15px;
     background: rgba(37, 24, 17, 0.8);
@@ -1907,7 +1906,7 @@ body {
 
 .clock {
     width: 120px;
-    height: 120px;
+    height: 170px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -1916,7 +1915,7 @@ body {
 }
 
 .clock-face {
-    width: 100%;
+    width: 125px;
     height: 100%;
     background: var(--paper);
     border-radius: 50%;
@@ -2037,8 +2036,7 @@ body {
 
 .clock {
     position: fixed;
-    top: 1rem;
-    right: 1rem;
+    top: 25px;
     z-index: 100;
     background: var(--panel-bg);
     padding: 0.5rem 1rem;
@@ -2058,4 +2056,7 @@ body {
     padding: 4px 10px;
     border-radius: 4px;
     border: 1px solid var(--gold-dark);
+    top: 190px;
+    position: relative;
 }
+

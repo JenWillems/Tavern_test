@@ -1,15 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 
 /**
  * Clock Component
  * Displays an antique-style clock with minute and second hands
  * 
  * @param {Object} props
- * @param {number} props.timeLeft - Time remaining in seconds
+ * @param {Function} props.onDayEnd - Callback when the day ends
+ * @param {boolean} props.extraTime - Whether extra time upgrade is active
  * @param {number} props.day - Current day number
  * @param {number} props.totalDays - Total number of days in the game
  */
-export default function Clock({ timeLeft, day, totalDays = 30 }) {
+const Clock = forwardRef(({ onDayEnd, extraTime = false, day, totalDays = 30 }, ref) => {
+    const BASE_TIME = 120; // 2 minutes base time
+    const EXTRA_TIME = 60;  // 1 minute extra time with upgrade
+    
+    const [timeLeft, setTimeLeft] = useState(extraTime ? BASE_TIME + EXTRA_TIME : BASE_TIME);
+    const [isRunning, setIsRunning] = useState(true);
+    
+    // Reset timer function exposed to parent
+    useImperativeHandle(ref, () => ({
+        resetTimer: () => {
+            setTimeLeft(extraTime ? BASE_TIME + EXTRA_TIME : BASE_TIME);
+            setIsRunning(true);
+        }
+    }));
+
+    // Timer effect
+    useEffect(() => {
+        let timer;
+        if (isRunning) {
+            timer = setInterval(() => {
+                setTimeLeft(prev => {
+                    if (prev <= 1) {
+                        clearInterval(timer);
+                        setIsRunning(false);
+                        onDayEnd();
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+
+        return () => {
+            if (timer) {
+                clearInterval(timer);
+            }
+        };
+    }, [onDayEnd, isRunning, extraTime]);
+
     // Convert timeLeft to minutes and seconds for the hands
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -73,4 +112,6 @@ export default function Clock({ timeLeft, day, totalDays = 30 }) {
             </div>
         </div>
     );
-} 
+});
+
+export default Clock; 
