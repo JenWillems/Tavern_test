@@ -155,10 +155,6 @@ body {
     min-width: 200px;
 }
 
-.button-mix {
-    position: relative;
-    padding-left: 48px; /* Space for the icon */
-}
 
 .ingredient-tag {
     background-color: #2b1810;
@@ -351,17 +347,6 @@ body {
     transform: rotateY(20deg);
 }
 
-.book-tabs {
-    display: flex;
-    padding: 15px 15px 0;
-    gap: 5px;
-    border-bottom: 2px solid rgba(166, 124, 82, 0.3);
-    background: linear-gradient(
-        to bottom,
-        rgba(37, 24, 17, 0.98),
-        rgba(37, 24, 17, 0.95)
-    );
-}
 
 .book-tab {
     padding: 10px 20px;

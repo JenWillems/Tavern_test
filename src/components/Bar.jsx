@@ -23,6 +23,13 @@ import sugar from '../assets/Garnishes/Sugar.png';
 import plankBottles from '../assets/plank_bottles.png';
 import plankGarnishes from '../assets/plank_garnishes.png';
 
+// Import chalk board icons
+import iconStirred from '../assets/chalk_board/icon_stirred.svg';
+import iconShaken from '../assets/chalk_board/icon_shaken.svg';
+import iconPoured from '../assets/chalk_board/icon_poured.svg';
+import serveDrink from '../assets/chalk_board/serve_drink.svg';
+import trashDrink from '../assets/chalk_board/Trash_drink.svg';
+
 const DRINKS = [
     { name: 'Firewater', type: 'Strong', class: 'button-firewater', image: strongBottle },
     { name: 'Berry', type: 'Sour', class: 'button-berry', image: sourBottle },
@@ -66,6 +73,7 @@ function Bar({
     const [selectedCocktail, setSelectedCocktail] = useState(null);
     const [currentMug, setCurrentMug] = useState(mugHoney); // Default mug
     const [dumpDrinkUses, setDumpDrinkUses] = useState(3); // Track dump drink uses
+    const [expandedCocktail, setExpandedCocktail] = useState(null);
 
     const handleIngredientClick = (drink) => {
         if (selectedIngredients.length < 4) {
@@ -78,7 +86,8 @@ function Bar({
     };
 
     const handleGarnishClick = (garnish) => {
-        setSelectedGarnish(garnish === selectedGarnish ? null : garnish);
+        const garnishObj = GARNISHES.find(g => g.name === garnish);
+        setSelectedGarnish(selectedGarnish?.name === garnish ? null : garnishObj);
     };
 
     const handleServingClick = (serving) => {
@@ -137,6 +146,10 @@ function Bar({
 
     const canServe = selectedIngredients.length > 0 && selectedServing !== null;
 
+    const toggleCocktailExpansion = (cocktailName) => {
+        setExpandedCocktail(expandedCocktail === cocktailName ? null : cocktailName);
+    };
+
     return (
         <div className="bar-container">
             {/* Character Section - Green */}
@@ -165,13 +178,13 @@ function Bar({
                         className={`book-tab ${activeTab === 'cocktails' ? 'active' : ''}`}
                         onClick={() => setActiveTab('cocktails')}
                     >
-                        Cocktail Book
+                        <img src="src/assets/Tags/cocktail-tage.png" alt="Cocktail Book" />
                     </button>
                     <button 
                         className={`book-tab ${activeTab === 'upgrades' ? 'active' : ''}`}
                         onClick={() => setActiveTab('upgrades')}
                     >
-                        Progress
+                        <img src="src/assets/Tags/progress-tag.png" alt="Progress" />
                     </button>
                 </div>
 
@@ -179,47 +192,47 @@ function Bar({
                     {activeTab === 'cocktails' ? (
                         <>
                             <div className="taste-filters">
-                                {TASTE_FILTERS.map(filter => (
+                                <button
+                                    className={`filter-button ${selectedFilters.includes('Sweet') ? 'active' : ''}`}
+                                    onClick={() => toggleFilter('Sweet')}
+                                >
+                                    <img src="src/assets/Tags/Sweet-tag.png" alt="Sweet" />
+                                </button>
+                                <button
+                                    className={`filter-button ${selectedFilters.includes('Herbal') ? 'active' : ''}`}
+                                    onClick={() => toggleFilter('Herbal')}
+                                >
+                                    <img src="src/assets/Tags/herbal-tag.png" alt="Herbal" />
+                                </button>
                                     <button
-                                        key={filter}
-                                        className={`filter-button ${selectedFilters.includes(filter) ? 'active' : ''}`}
-                                        onClick={() => toggleFilter(filter)}
+                                    className={`filter-button ${selectedFilters.includes('Strong') ? 'active' : ''}`}
+                                    onClick={() => toggleFilter('Strong')}
                                     >
-                                        {filter}
+                                    <img src="src/assets/Tags/Strong-tag.png" alt="Strong" />
                                     </button>
-                                ))}
-                                {selectedFilters.length > 0 && (
                                     <button
-                                        className="filter-button clear-filters"
-                                        onClick={clearFilters}
+                                    className={`filter-button ${selectedFilters.includes('Sour') ? 'active' : ''}`}
+                                    onClick={() => toggleFilter('Sour')}
                                     >
-                                        Clear Filters
+                                    <img src="src/assets/Tags/Sour-tag.png" alt="Sour" />
                                     </button>
-                                )}
                             </div>
                             <div className="cocktail-list">
-                                {filteredCocktails.map(cocktail => (
+                                {filteredCocktails.map((cocktail) => (
                                     <div 
                                         key={cocktail.name} 
-                                        className={`cocktail-entry ${selectedCocktail === cocktail.name ? 'expanded' : ''}`}
-                                        onClick={() => setSelectedCocktail(selectedCocktail === cocktail.name ? null : cocktail.name)}
+                                        className={`cocktail-entry ${expandedCocktail === cocktail.name ? 'expanded' : ''}`}
+                                        onClick={() => toggleCocktailExpansion(cocktail.name)}
                                     >
                                         <h3>{cocktail.name}</h3>
+                                        {expandedCocktail === cocktail.name && (
                                         <div className="cocktail-details">
-                                            <p>{cocktail.notes}</p>
-                                            <p><strong>Ingredients:</strong> {cocktail.ingredients.join(', ')}</p>
-                                            {cocktail.garnishes && (
-                                                <p><strong>Garnish:</strong> {cocktail.garnishes.join(', ')}</p>
-                                            )}
-                                            {cocktail.serving && (
-                                                <p><strong>Serving:</strong> {cocktail.serving}</p>
-                                            )}
-                                            <div className="cocktail-tags">
-                                                {cocktail.tags?.map(tag => (
-                                                    <span key={tag} className="cocktail-tag">{tag}</span>
-                                                ))}
+                                                <p>{cocktail.description}</p>
+                                                <p>Ingredients: {cocktail.ingredients.join(', ')}</p>
+                                                <p>Garnish: {cocktail.garnish}</p>
+                                                <p>Serving: {cocktail.serving}</p>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -304,10 +317,11 @@ function Bar({
             {/* Ingredients Section */}
             <div className="ingredients-section">
                 <div className="bottles-shelf">
+                    <img src={plankBottles} alt="Bottles Shelf" className="shelf-image shelf-top" />
                     {DRINKS.map((drink) => (
                         <button
                             key={drink.name}
-                            className={`button-mix ${selectedIngredients.includes(drink) ? 'selected' : ''}`}
+                            className={`button-mix ${drink.class} ${selectedIngredients.includes(drink) ? 'selected' : ''}`}
                             onClick={() => handleIngredientClick(drink)}
                             disabled={selectedIngredients.length >= 4}
                             title={`${drink.name} (${drink.type})`}
@@ -321,68 +335,122 @@ function Bar({
                     ))}
                 </div>
                 <div className="garnishes-shelf">
-                    {GARNISHES.map((garnish) => (
+                    <img src={plankGarnishes} alt="Middle Shelf" className="shelf-image shelf-middle" />
+                    <img src={plankGarnishes} alt="Bottom Shelf" className="shelf-image shelf-bottom" />
+                    <button
+                        className={`garnish-button ${selectedGarnish?.name === 'Mint Leaf' ? 'selected' : ''}`}
+                        onClick={() => handleGarnishClick('Mint Leaf')}
+                        disabled={selectedIngredients.length >= 4}
+                    >
+                        <img src={mintLeaf} alt="Mint Leaf" className="mint-leaf" />
+                    </button>
+                    <button
+                        className={`garnish-button ${selectedGarnish?.name === 'Lemon Twist' ? 'selected' : ''}`}
+                        onClick={() => handleGarnishClick('Lemon Twist')}
+                        disabled={selectedIngredients.length >= 4}
+                    >
+                        <img src={lemon} alt="Lemon Twist" className="lemon-twist" />
+                    </button>
+                    <button
+                        className={`garnish-button ${selectedGarnish?.name === 'Chili Flake' ? 'selected' : ''}`}
+                        onClick={() => handleGarnishClick('Chili Flake')}
+                        disabled={selectedIngredients.length >= 4}
+                    >
+                        <img src={chiliFlakes} alt="Chili Flake" className="chili-flakes" />
+                    </button>
                         <button
-                            key={garnish.name}
-                            className={`button-mix ${selectedGarnish === garnish ? 'selected' : ''}`}
-                            onClick={() => handleGarnishClick(garnish)}
-                            title={`${garnish.name} (${garnish.type})`}
+                        className={`garnish-button ${selectedGarnish?.name === 'Sugar Rim' ? 'selected' : ''}`}
+                        onClick={() => handleGarnishClick('Sugar Rim')}
+                        disabled={selectedIngredients.length >= 4}
                         >
-                            <img 
-                                src={garnish.image} 
-                                alt={garnish.name} 
-                                className="garnish-image"
-                            />
+                        <img src={sugar} alt="Sugar Rim" className="sugar-rim" />
                         </button>
-                    ))}
                 </div>
             </div>
 
             {/* Mixing Area */}
             <div className="mixing-area">
+                {/* Ingredients Section */}
                 <div className="selected-ingredients">
-                    {selectedIngredients.map((ingredient, index) => (
-                        <div key={index} className="selected-ingredient">
-                            <span>{ingredient.name}</span>
-                            <button onClick={() => removeIngredient(index)}>&times;</button>
-                        </div>
-                    ))}
+                    <h2 className="ingredients-title">Ingredients:</h2>
+                    <div className="ingredients-grid">
+                        {selectedIngredients.map((ingredient, index) => (
+                            <div key={index} className="ingredient-item">
+                                {ingredient.name}
+                            </div>
+                        ))}
+                    </div>
                     {selectedGarnish && (
-                        <div className="selected-ingredient">
-                            <span>{selectedGarnish.name}</span>
-                            <button onClick={() => setSelectedGarnish(null)}>&times;</button>
+                        <div className="garnish-item">
+                            {selectedGarnish.name}
                         </div>
                     )}
                 </div>
 
-                <div className="serving-options">
-                    {SERVING_OPTIONS.map(option => (
+                {/* Bottom Controls */}
+                <div className="bottom-controls">
+                    {/* Serving Options */}
+                    <div className="serving-options">
                         <button
-                            key={option}
-                            className={`serving-option ${selectedServing === option ? 'selected' : ''}`}
-                            onClick={() => handleServingClick(option)}
+                            className={`serving-option ${selectedServing === 'Stirred' ? 'selected' : ''}`}
+                            onClick={() => handleServingClick('Stirred')}
                         >
-                            {option}
+                            Stirred
+                            <img 
+                                src={iconStirred}
+                                alt="Stirred" 
+                                className="serving-icon" 
+                            />
                         </button>
-                    ))}
-                </div>
+                        <button
+                            className={`serving-option ${selectedServing === 'Shaken' ? 'selected' : ''}`}
+                            onClick={() => handleServingClick('Shaken')}
+                        >
+                            Shaken
+                            <img 
+                                src={iconShaken}
+                                alt="Shaken" 
+                                className="serving-icon" 
+                            />
+                        </button>
+                        <button
+                            className={`serving-option ${selectedServing === 'Poured' ? 'selected' : ''}`}
+                            onClick={() => handleServingClick('Poured')}
+                        >
+                            Poured
+                            <img 
+                                src={iconPoured}
+                                alt="Poured" 
+                                className="serving-icon" 
+                            />
+                        </button>
+                    </div>
 
-                <div className="action-buttons">
-                    <button
-                        className="serve-button"
-                        onClick={handleServe}
-                        disabled={!canServe}
-                    >
-                        Serve Drink
-                    </button>
-                    {selectedIngredients.length > 0 && dumpDrinkUses > 0 && (
+                    {/* Action Buttons */}
+                    <div className="action-buttons">
+                        <button
+                            className="serve-button"
+                            onClick={handleServe}
+                            disabled={!canServe}
+                        >
+                            <img 
+                                src={serveDrink}
+                                alt="Serve your drink" 
+                                className="action-icon" 
+                            />
+                        </button>
                         <button
                             className="dump-button"
                             onClick={handleDumpDrink}
+                            disabled={selectedIngredients.length === 0 || dumpDrinkUses <= 0}
                         >
-                            Dump Drink ({dumpDrinkUses})
+                            <img 
+                                src={trashDrink}
+                                alt="Trash it" 
+                                className="action-icon" 
+                            />
                         </button>
-                    )}
+                    </div>
                 </div>
             </div>
         </div>
