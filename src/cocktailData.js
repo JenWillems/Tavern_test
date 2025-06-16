@@ -187,7 +187,7 @@ export const cocktailRecipes = [
         ingredients: ['Firewater', 'Herbal', 'Herbal', 'Honey'],
         garnishes: LEMON_TWIST,
         serving: STIRRED,
-        notes: 'Like a brain rot sing-along — endlessly bitter, a little confusing, and somehow impossible to stop repeating',
+        notes: 'A LORD HE COMMING',
         tags: ['Secret'],
     },
     {
@@ -203,7 +203,7 @@ export const cocktailRecipes = [
         ingredients: ['Firewater', 'Berry', 'Firewater', 'Berry'],
         garnishes: CHILI_FLAKE,
         serving: STIRRED,
-        notes: "Doesnt matter how big the room i cast fireball",
+        notes: "Doesnt matter how big the room, i cast fireball",
         tags: ['Secret'],
     },
 ];
