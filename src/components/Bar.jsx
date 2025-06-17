@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Bar.css';
+import DrinkFeedbackPopup from './DrinkFeedbackPopup';
 // Import all mug images
 import mugHoney from '../assets/Mugs/mug_mostly_honey.png';
 import mugBerry from '../assets/Mugs/mug_mostly_berry.png';
@@ -74,6 +75,8 @@ function Bar({
     const [currentMug, setCurrentMug] = useState(mugHoney); // Default mug
     const [dumpDrinkUses, setDumpDrinkUses] = useState(3); // Track dump drink uses
     const [expandedCocktail, setExpandedCocktail] = useState(null);
+    const [showFeedback, setShowFeedback] = useState(false);
+    const [feedbackResult, setFeedbackResult] = useState(null);
 
     const handleIngredientClick = (drink) => {
         if (selectedIngredients.length < 4) {
@@ -95,26 +98,33 @@ function Bar({
     };
 
     const handleServe = () => {
-        // Determine the dominant ingredient
+        if (selectedIngredients.length === 0) return;
+
+        // Find the dominant ingredient
         const ingredientCounts = {};
-        selectedIngredients.forEach(ing => {
-            ingredientCounts[ing.name] = (ingredientCounts[ing.name] || 0) + 1;
+        selectedIngredients.forEach(ingredient => {
+            ingredientCounts[ingredient] = (ingredientCounts[ingredient] || 0) + 1;
         });
-        
-        // Find the ingredient with the highest count
-        let dominantIngredient = Object.entries(ingredientCounts)
-            .sort(([,a], [,b]) => b - a)[0][0];
-        
-        // Update the mug image based on the dominant ingredient
-        setCurrentMug(MUG_IMAGES[dominantIngredient] || mugHoney);
-        
-        // Call the original onServeDrink
-        onServeDrink(selectedIngredients, selectedGarnish, selectedServing);
-        
-        // Reset selections
+
+        let dominantIngredient = '';
+        let maxCount = 0;
+
+        for (const [ingredient, count] of Object.entries(ingredientCounts)) {
+            if (count > maxCount) {
+                maxCount = count;
+                dominantIngredient = ingredient;
+            }
+        }
+
+        const result = onServeDrink(dominantIngredient);
+        setFeedbackResult(result);
+        setShowFeedback(true);
         setSelectedIngredients([]);
-        setSelectedGarnish(null);
-        setSelectedServing(null);
+    };
+
+    const handleCloseFeedback = () => {
+        setShowFeedback(false);
+        setFeedbackResult(null);
     };
 
     const toggleFilter = (filter) => {
@@ -452,6 +462,14 @@ function Bar({
                 </div>
                 </div>
             </div>
+
+            {showFeedback && (
+                <DrinkFeedbackPopup
+                    result={feedbackResult}
+                    currentMission={currentMission}
+                    onClose={handleCloseFeedback}
+                />
+            )}
         </div>
     );
 }

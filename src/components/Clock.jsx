@@ -1,34 +1,58 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
 
 /**
  * Clock Component
  * Displays an antique-style clock with minute and second hands
+ * Implements progressive time reduction system:
+ * - Days 1-3: 5 minutes (tutorial period)
+ * - Days 4-15: 3 minutes (normal period)
+ * - Days 16+: 2 minutes (hard period)
+ * - Extra time upgrade adds 1 minute
  * 
  * @param {Object} props
  * @param {Function} props.onDayEnd - Callback when the day ends
  * @param {boolean} props.extraTime - Whether extra time upgrade is active
  * @param {number} props.day - Current day number
  * @param {number} props.totalDays - Total number of days in the game
+ * @param {boolean} props.showTutorial - Whether the tutorial is currently active
  */
-const Clock = forwardRef(({ onDayEnd, extraTime = false, day, totalDays = 30 }, ref) => {
-    const BASE_TIME = 120; // 2 minutes base time
-    const EXTRA_TIME = 60;  // 1 minute extra time with upgrade
-    
-    const [timeLeft, setTimeLeft] = useState(extraTime ? BASE_TIME + EXTRA_TIME : BASE_TIME);
+const Clock = forwardRef(({ onDayEnd, extraTime = false, day, totalDays = 30, showTutorial = false }, ref) => {
+    // Time configurations in seconds
+    const TIME_CONFIGS = {
+        TUTORIAL: 300,    // 5 minutes for first 3 days
+        NORMAL: 180,      // 3 minutes for days 4-15
+        HARD: 120,        // 2 minutes for days 16+
+        EXTRA_TIME: 60    // 1 minute extra with upgrade
+    };
+
+    // Calculate base time based on current day
+    const getBaseTime = useMemo(() => {
+        if (day <= 3) return TIME_CONFIGS.TUTORIAL;
+        if (day <= 15) return TIME_CONFIGS.NORMAL;
+        return TIME_CONFIGS.HARD;
+    }, [day]);
+
+    // State for time management
+    const [timeLeft, setTimeLeft] = useState(getBaseTime + (extraTime ? TIME_CONFIGS.EXTRA_TIME : 0));
     const [isRunning, setIsRunning] = useState(true);
     
-    // Reset timer function exposed to parent
+    // Expose reset timer function to parent component
     useImperativeHandle(ref, () => ({
         resetTimer: () => {
-            setTimeLeft(extraTime ? BASE_TIME + EXTRA_TIME : BASE_TIME);
+            setTimeLeft(getBaseTime + (extraTime ? TIME_CONFIGS.EXTRA_TIME : 0));
             setIsRunning(true);
         }
     }));
 
-    // Timer effect
+    // Update time when day changes or extra time upgrade is purchased
+    useEffect(() => {
+        setTimeLeft(getBaseTime + (extraTime ? TIME_CONFIGS.EXTRA_TIME : 0));
+    }, [day, extraTime, getBaseTime]);
+
+    // Timer effect - handles countdown and day end
     useEffect(() => {
         let timer;
-        if (isRunning) {
+        if (isRunning && !showTutorial) {
             timer = setInterval(() => {
                 setTimeLeft(prev => {
                     if (prev <= 1) {
@@ -47,18 +71,42 @@ const Clock = forwardRef(({ onDayEnd, extraTime = false, day, totalDays = 30 }, 
                 clearInterval(timer);
             }
         };
-    }, [onDayEnd, isRunning, extraTime]);
+    }, [onDayEnd, isRunning, showTutorial]);
 
-    // Convert timeLeft to minutes and seconds for the hands
+    // Calculate time display values
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
     
-    // Calculate rotation angles for the hands
-    // For a 2-minute game (120 seconds):
-    // - Minute hand should make 1/30th of a full rotation (12 deg) per second
-    // - Second hand should make 1/60th of a full rotation (6 deg) per second
-    const minuteRotation = ((120 - timeLeft) * (360 / 120)) % 360;
+    // Calculate hand rotations
+    // Minute hand: rotates based on current time period (5min/3min/2min)
+    // Second hand: rotates 360 degrees per minute (6 degrees per second)
+    const minuteRotation = ((getBaseTime - timeLeft) * (360 / getBaseTime)) % 360;
     const secondRotation = ((60 - seconds) * 6) % 360;
+
+    // Generate clock numbers with proper positioning
+    const clockNumbers = useMemo(() => 
+        [...Array(12)].map((_, i) => {
+            const number = i === 0 ? '12' : i;
+            const angle = (i * 30) * (Math.PI / 180);
+            const radius = 42;
+            const x = Math.sin(angle) * radius;
+            const y = -Math.cos(angle) * radius;
+            
+            return (
+                <span 
+                    key={i} 
+                    className="clock-number"
+                    style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '50%',
+                        transform: `translate(${x}px, ${y}px)`
+                    }}
+                >
+                    {number}
+                </span>
+            );
+        }), []);
 
     return (
         <div className="clock-container">
@@ -68,30 +116,7 @@ const Clock = forwardRef(({ onDayEnd, extraTime = false, day, totalDays = 30 }, 
             <div className="clock">
                 <div className="clock-face">
                     {/* Clock numbers */}
-                    {[...Array(12)].map((_, i) => {
-                        const number = i === 0 ? '12' : i;
-                        const angle = (i * 30) * (Math.PI / 180); // Convert to radians
-                        const radius = 42; // Increased distance from center
-                        
-                        // Calculate x and y positions using trigonometry
-                        const x = Math.sin(angle) * radius;
-                        const y = -Math.cos(angle) * radius; // Negative because Y grows downward in CSS
-                        
-                        return (
-                            <span 
-                                key={i} 
-                                className="clock-number"
-                                style={{
-                                    position: 'absolute',
-                                    left: '50%',
-                                    top: '50%',
-                                    transform: `translate(${x}px, ${y}px)`
-                                }}
-                            >
-                                {number}
-                            </span>
-                        );
-                    })}
+                    {clockNumbers}
                     
                     {/* Clock hands */}
                     <div 
