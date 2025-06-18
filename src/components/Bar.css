@@ -1,4 +1,5 @@
 .bar-container {
+    width: 100%;
     height: 100vh;
     display: grid;
     grid-template-columns: minmax(600px, 1fr) minmax(250px, 400px);
@@ -6,6 +7,8 @@
     gap: 2px;
     background-color: #000;
     padding: 2px;
+    overflow: hidden;
+    min-height: 600px;
 }
 
 /* Character Section - Green */
@@ -15,10 +18,10 @@
     background-color: #2b1810;
     background-image: url('../assets/wallpaper.png');
     background-size: auto;
-    border: none;
+    border: 4px solid #00ff00;
     position: relative;
     overflow: hidden;
-    height: 550px;
+    min-height: 300px;
 }
 
 .character {
@@ -63,7 +66,7 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    border: none;
+    border: 4px solid #0000ff;
     display: flex;
     flex-direction: column;
     min-width: 200px;
@@ -93,8 +96,6 @@
     background: rgba(87, 37, 31, 0.95);
     width: 100%;
     border-bottom: 2px solid rgba(87, 37, 31, 0.98);
-    padding-top: 5px;
-    padding-bottom: 5px;
 }
 
 .book-tab {
@@ -147,7 +148,6 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transition: all 0.3s ease;
 }
 
 .filter-button:hover {
@@ -156,11 +156,6 @@
 
 .filter-button.active {
     transform: translateY(-4px);
-}
-
-.filter-button.active img {
-    filter: drop-shadow(0 0 8px #ffd700);
-    transform: scale(1.1);
 }
 
 .cocktail-list {
@@ -279,39 +274,30 @@
 }
 
 .upgrade-list {
-    background: #d4b995;
-    background-image: linear-gradient(rgba(43, 24, 16, 0.4), rgba(43, 24, 16, 0.4)), url('../assets/book_background.png');
-    background-size: cover;
-    background-position: center;
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
 }
 
 .upgrade-item {
-    background: #ffdaab57;
-    border-radius: 10px;
-    padding: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    background: var(--panel-bg);
+    border: 1px solid var(--gold-dark);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
 }
 
 .upgrade-item h3 {
-    margin: 0 0 6px 0;
-    font-size: 1.2em;
-    color: black;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    font-family: 'Cinzel Decorative', serif;
 }
 
 .upgrade-item p {
-    margin: 0 0 10px 0;
-    font-size: 1em;
-    color: black;
+    color: var(--paper);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
 }
 
 .upgrade-item button {
@@ -343,13 +329,12 @@
     background-image: url('../assets/bar_background.png');
     background-size: cover;
     background-position: center;
-    border: none;
+    border: 4px solid #ff0000;
     display: flex;
-    gap: 50px;
+    gap: 100px;
+    height: 300px;
     display: flex;
     justify-content: space-between;
-    position: relative;
-    bottom: 0;
 }
 
 .bottles-shelf {
@@ -366,14 +351,11 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 12px;
-    padding: 10px;
-    width: 100%;
-    min-height: 180px;
+    gap: 10px;
+    padding: 20px;
+    width: 50%;
+    min-height: 300px;
     position: relative;
-    background: none;
-    align-items: center;
-    justify-items: center;
 }
 
 .shelf-image {
@@ -410,31 +392,17 @@
 }
 
 .garnish-button {
-    background: none;
+    background-color: transparent;
     border: none;
     padding: 0;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 80px;
-    height: 80px;
     transition: transform 0.2s, filter 0.2s;
-}
-
-.garnish-button img {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-    display: block;
-}
-
-.garnish-button.selected {
-    filter: drop-shadow(0 0 6px #ffd700);
-}
-
-.garnish-button:hover {
-    transform: scale(1.08);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
+    top: -35%;
+    position: relative;
 }
 
 /* Mint Leaf - Top Left */
@@ -494,20 +462,28 @@
     top: -35%;
 }
 
+.garnish-button:hover {
+    transform: scale(1.1);
+}
+
+.garnish-button.selected {
+    filter: drop-shadow(0 0 6px #ffd700);
+}
+
 /* Mixing Area - Chalkboard */
 .mixing-area {
     grid-column: 2;
     grid-row: 2;
     background: #2A3B2A;
-    padding: 5px;
-    border: none;
-    margin-top: 5px;
+    padding: 10px;
+    border: 4px solid #1a291a;
+    margin-top: 10px;
     position: relative;
     font-family: 'Chalk', cursive;
     color: #fff;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -559,8 +535,8 @@
 .bottom-controls {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    margin-top: 5px;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 /* Serving options */
@@ -584,12 +560,13 @@
     font-size: 1.2em;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     width: 100%;
-
+    box-sizing: border-box;
+    min-height: 40px;
 }
 
 .serving-icon {
-    width: 60px;
-    height: 60px;
+    width: 28px;
+    height: 28px;
     filter: brightness(0) invert(1);
     margin-left: 10px;
     display: block;
@@ -604,14 +581,13 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
-    justify-content: center;
-    margin-top: 5px;
+    width: 100%;
 }
 
 .serve-button, .dump-button {
-    background: none;
-    border: none;
-    padding: 0;
+    background: #D2B48C;
+    border: 2px solid #000;
+    padding: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -619,46 +595,15 @@
     width: 100%;
     box-sizing: border-box;
     aspect-ratio: 1;
-    min-width: 60px;
-    min-height: 60px;
 }
 
 .dump-button {
-    background: none;
-}
-
-.dump-button .action-icon {
-    filter: brightness(0) saturate(100%) invert(12%) sepia(100%) saturate(1000%) hue-rotate(357deg) brightness(95%) contrast(104%);
-}
-
-.dump-button:hover .action-icon {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.dump-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    background: #8B4513;
 }
 
 .serve-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-.action-icon {
-    width: 100%;
-    height: 100%;
-    opacity: 0.8;
-    transition: all 0.2s ease;
-    min-width: 60px;
-    min-height: 60px;
-}
-
-.serve-button:hover .action-icon,
-.dump-button:hover .action-icon {
-    opacity: 1;
-    transform: scale(1.1);
 }
 
 /* Fix SVG display */
@@ -1010,13 +955,13 @@
 }
 
 .finance-display {
-    background: rgba(43, 24, 16, 0.3);
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 1rem;
+    background: var(--panel-bg);
+    border: 1px solid var(--gold-dark);
+    border-radius: 8px;
+    margin-bottom: 1rem;
 }
 
 .gold-display, .debt-display {
@@ -1029,7 +974,7 @@
 
 .gold-display {
     background: rgba(212, 175, 55, 0.1);
-    color: black;
+    color: var(--gold);
 }
 
 .debt-display {
@@ -1096,6 +1041,12 @@
     background: rgba(166, 124, 82, 0.2);
 }
 
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
 
 .dump-button {
     background: #8B0000;
@@ -1148,7 +1099,14 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-
+/* Serving icons */
+.serving-icon {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
 
 .serving-option:hover .serving-icon {
     opacity: 1;
@@ -1165,6 +1123,7 @@
     width: 24px;
     height: 24px;
     margin-right: 8px;
+    filter: brightness(0) invert(1);
     opacity: 0.8;
     vertical-align: middle;
 }
@@ -1197,61 +1156,10 @@
 
 .serving-option {
     display: flex;
-    gap: 5px;
-    padding: 10px;
-    height: 60px;
-}
-
-.tag-button {
-    position: relative;
-    display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: 170px;
-    height: 110px;
-    border: 4px solid #222;
-    border-radius: 18px;
-    margin: 8px 0;
-    box-sizing: border-box;
-    background: #e2c18b;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-    padding: 0;
-    transition: transform 0.1s;
-}
-
-.serve-button.tag-button {
-    background: #e2c18b;
-}
-
-.dump-button.tag-button {
-    background: #c97a5b;
-}
-
-.tag-hole {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 18px;
-    height: 18px;
-    background: #e5ded2;
-    border: 2.5px solid #222;
-    border-radius: 50%;
-    z-index: 2;
-}
-
-.tag-text {
-    margin-top: 28px;
-    font-family: 'Georgia', 'Times New Roman', serif;
-    font-weight: bold;
-    font-size: 1.6rem;
-    color: #222;
-    text-align: center;
-    line-height: 1.1;
-    z-index: 1;
-}
-
-.tag-button:active {
-    transform: scale(0.97);
+    gap: 5px;
+    padding: 10px;
+    width: 60px;
+    height: 60px;
 } 

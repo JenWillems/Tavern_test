@@ -12,7 +12,6 @@ import LorePopup from './components/LorePopup';
 import SecretDiscoveryPopup from './components/SecretDiscoveryPopup';
 import GameOverScreen from './components/GameOverScreen';
 import FinanceReport from './components/FinanceReport';
-import TutorialPopup from './components/TutorialPopup';
 
 const INITIAL_DEBT = -20000; // Starting debt
 const MAX_DAYS = 30; // Days until eviction
@@ -25,7 +24,6 @@ export default function App() {
     const [drinksServed, setDrinksServed] = useState(0);
     const [currentMission, setCurrentMission] = useState(null);
     const [showLorePopup, setShowLorePopup] = useState(true);
-    const [showTutorial, setShowTutorial] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [discoveredSecrets, setDiscoveredSecrets] = useState([]);
     const [showSecretPopup, setShowSecretPopup] = useState(false);
@@ -168,26 +166,10 @@ export default function App() {
         }
     }, []);
 
-    // Handle lore popup close
-    const handleLoreClose = () => {
-        setShowLorePopup(false);
-        setShowTutorial(true);
-    };
-
-    // Handle tutorial close
-    const handleTutorialClose = () => {
-        setShowTutorial(false);
-        setCurrentMission(getRandomMission());
-    };
-
     return (
         <div className="app">
             {showLorePopup && (
-                <LorePopup onClose={handleLoreClose} />
-            )}
-
-            {showTutorial && (
-                <TutorialPopup onClose={handleTutorialClose} />
+                <LorePopup onClose={() => setShowLorePopup(false)} />
             )}
 
             {showSecretPopup && lastDiscoveredSecret && (
@@ -195,6 +177,7 @@ export default function App() {
                     discoveredSecret={cocktailRecipes.find(recipe => recipe.name === lastDiscoveredSecret)}
                     onClose={() => setShowSecretPopup(false)}
                     resetMix={() => {
+                        // Reset mixing state
                         setMixingGlass([]);
                         setSelectedGarnish(null);
                         setServingMethod(null);
