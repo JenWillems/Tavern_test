@@ -53,24 +53,20 @@ export default function App() {
     }, [currentMission]);
 
     // Handle drink serving
-    const handleServeDrink = useCallback((dominantIngredient) => {
+    const handleServeDrink = useCallback((ingredients, garnish, serving) => {
         // Convert ingredients to the format expected by evaluateDrink
-        const ingredientsForEval = [{ name: dominantIngredient }];
+        const ingredientsForEval = ingredients.map(ing => ({ name: ing.name }));
+        const garnishForEval = garnish ? { name: garnish.name } : null;
         
-        const result = evaluateDrink(ingredientsForEval, currentMission);
+        const result = evaluateDrink(ingredientsForEval, currentMission, garnishForEval, serving);
         
         // Update money and stats
         const basePrice = 20;
         const drinkBonus = upgrades.drinkIncome ? 10 : 0;
         const earnings = basePrice + drinkBonus;
         
-        if (result.success) {
-            setAvailableGold(prev => prev + earnings);
-            setDrinksServed(prev => prev + 1);
-        } else {
-            // Penalty for wrong drink
-            setAvailableGold(prev => Math.max(0, prev - 10));
-        }
+        setAvailableGold(prev => prev + earnings);
+        setDrinksServed(prev => prev + 1);
 
         // Check for secret discovery
         const matchedRecipe = cocktailRecipes.find(recipe => recipe.name === result.drinkName);
@@ -82,16 +78,6 @@ export default function App() {
 
         // Get new mission
         setCurrentMission(getRandomMission());
-
-        // Return feedback result
-        return {
-            success: result.success,
-            drink: result.drinkName,
-            isKnownRecipe: matchedRecipe !== undefined,
-            message: result.success 
-                ? "Perfect! The customer is delighted with their drink."
-                : "The customer is disappointed with their drink."
-        };
     }, [currentMission, upgrades.drinkIncome, discoveredSecrets]);
 
     // Handle day end
@@ -212,7 +198,6 @@ export default function App() {
                         extraTime={upgrades.extraTime}
                         day={day}
                         totalDays={MAX_DAYS}
-                        showTutorial={showTutorial}
                     />
 
                     <Bar
