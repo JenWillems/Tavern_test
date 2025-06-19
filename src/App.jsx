@@ -34,6 +34,9 @@ export default function App() {
     const [selectedGarnish, setSelectedGarnish] = useState(null);
     const [servingMethod, setServingMethod] = useState(null);
     const [showFinanceReport, setShowFinanceReport] = useState(false);
+    const [feedbackMessage, setFeedbackMessage] = useState("");
+    const [feedbackType, setFeedbackType] = useState("");
+    const feedbackTimeoutRef = useRef(null);
 
     // Upgrades state
     const [upgrades, setUpgrades] = useState({
@@ -56,30 +59,40 @@ export default function App() {
 
     // Handle drink serving
     const handleServeDrink = useCallback((ingredients, garnish, serving) => {
-        // Convert ingredients to the format expected by evaluateDrink
         const ingredientsForEval = ingredients.map(ing => ({ name: ing.name }));
         const garnishForEval = garnish ? { name: garnish.name } : null;
-        
         const result = evaluateDrink(ingredientsForEval, currentMission, garnishForEval, serving);
-        
+        // Feedback logic
+        if (result.points > 0) {
+            setFeedbackMessage("Great job! The drink was correct.");
+            setFeedbackType("success");
+        } else {
+            setFeedbackMessage("Oops! That wasn't what the customer wanted.");
+            setFeedbackType("error");
+        }
+        if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+        feedbackTimeoutRef.current = setTimeout(() => {
+            setFeedbackMessage("");
+            setFeedbackType("");
+            setCurrentMission(getRandomMission());
+        }, 2000);
         // Update money and stats
         const basePrice = 20;
         const drinkBonus = upgrades.drinkIncome ? 10 : 0;
         const earnings = basePrice + drinkBonus;
-        
         setAvailableGold(prev => prev + earnings);
         setDrinksServed(prev => prev + 1);
-
-        // Check for secret discovery
         const matchedRecipe = cocktailRecipes.find(recipe => recipe.name === result.drinkName);
-        if (matchedRecipe?.tags?.includes('Secret') && !discoveredSecrets.includes(result.drinkName)) {
-            setDiscoveredSecrets(prev => [...prev, result.drinkName]);
-            setLastDiscoveredSecret(result.drinkName);
-            setShowSecretPopup(true);
+        if (matchedRecipe?.tags?.includes('Secret')) {
+            if (result.drinkName === 'FIREBALL') {
+                setLastDiscoveredSecret(result.drinkName);
+                setShowSecretPopup(true);
+            } else if (!discoveredSecrets.includes(result.drinkName)) {
+                setDiscoveredSecrets(prev => [...prev, result.drinkName]);
+                setLastDiscoveredSecret(result.drinkName);
+                setShowSecretPopup(true);
+            }
         }
-
-        // Get new mission
-        setCurrentMission(getRandomMission());
     }, [currentMission, upgrades.drinkIncome, discoveredSecrets]);
 
     // Handle day end
@@ -226,6 +239,8 @@ export default function App() {
                         availableGold={availableGold}
                         totalMoney={money}
                         discoveredSecrets={discoveredSecrets}
+                        feedbackMessage={feedbackMessage}
+                        feedbackType={feedbackType}
                     />
                 </>
             )}

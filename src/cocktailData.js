@@ -187,7 +187,7 @@ export const cocktailRecipes = [
         ingredients: ['Firewater', 'Herbal', 'Herbal', 'Honey'],
         garnishes: LEMON_TWIST,
         serving: STIRRED,
-        notes: 'A LORD HE COMMING',
+        notes: 'FULL OF PROTEIN',
         tags: ['Secret'],
     },
     {

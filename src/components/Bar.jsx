@@ -24,7 +24,7 @@ import plankBottles from '../assets/plank_bottles.png';
 import plankGarnishes from '../assets/plank_garnishes.png';
 
 // Import chalk board icons
-import iconStirred from '../assets/chalk_board/icon_stirred.svg';
+import iconStirred from '../assets/chalk_board/icon_stirred.png';
 import iconShaken from '../assets/chalk_board/icon_shaken.svg';
 import iconPoured from '../assets/chalk_board/icon_poured.svg';
 import serveDrink from '../assets/chalk_board/serve_drink.svg';
@@ -63,7 +63,9 @@ function Bar({
     onUpgrade, 
     availableGold, 
     totalMoney,
-    discoveredSecrets = []
+    discoveredSecrets = [],
+    feedbackMessage = "",
+    feedbackType = ""
 }) {
     const [selectedIngredients, setSelectedIngredients] = useState([]);
     const [selectedGarnish, setSelectedGarnish] = useState(null);
@@ -164,7 +166,7 @@ function Bar({
             {/* Character Section - Green */}
             <div className="character-section">
                 <div className="speech-bubble">
-                    <p>{typeof currentMission === 'string' ? currentMission : currentMission?.text || 'Loading...'}</p>
+                    <p>{feedbackMessage ? feedbackMessage : (typeof currentMission === 'string' ? currentMission : currentMission?.text || 'Loading...')}</p>
                 </div>
                 <div className="character">
                     <img src={currentMug} alt="Mug Character" className="mug-image" />
