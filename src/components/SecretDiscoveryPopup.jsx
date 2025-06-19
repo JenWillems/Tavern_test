@@ -23,14 +23,28 @@ export default function SecretDiscoveryPopup({ discoveredSecret, onClose, resetM
     return (
         <div className="secret-discovery">
             {discoveredSecret.name === 'FIREBALL' ? (
-                <div className="secret-discovery-content fireball" style={{ background: 'linear-gradient(135deg, #0a0300 80%, #ff3300 100%)', boxShadow: '0 0 80px 30px #ff3300, 0 0 160px 40px #000 inset' }}>
-                    <div className="fire-anim" style={{ width: 220, height: 220, margin: '0 auto 24px auto', backgroundSize: 'cover', boxShadow: '0 0 80px 40px #ff3300, 0 0 120px 60px #ff6600' }} />
-                    <h2 style={{ color: '#ffae42', fontSize: '2.5em', textShadow: '0 0 32px #ff6600, 0 0 64px #ff3300' }}>�� FIREBALL! 🔥</h2>
-                    <div className="explosion-anim" style={{ width: 260, height: 160, margin: '0 auto 24px auto', backgroundSize: 'cover', boxShadow: '0 0 60px 30px #ffae42' }} />
-                    <div className="video-container" style={{ margin: '20px 0' }}>
+                <div className="secret-discovery-content fireball">
+                    <div className="runes">
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                    </div>
+                    <div className="fire-anim" />
+                    <h2>Secret Ritual: FIREBALL</h2>
+                    <div className="runes">
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                    </div>
+                    <div className="explosion-anim" />
+                    <div className="video-container" style={{ margin: '16px 0' }}>
                         <iframe
-                            width="480"
-                            height="270"
+                            width="320"
+                            height="180"
                             src="https://www.youtube.com/embed/WMDwy0D-1aA?autoplay=1"
                             frameBorder="0"
                             allow="autoplay; encrypted-media"
@@ -38,14 +52,61 @@ export default function SecretDiscoveryPopup({ discoveredSecret, onClose, resetM
                             title="Fireball Secret Video"
                         ></iframe>
                     </div>
-                    <div className="notes" style={{ background: 'rgba(10,0,0,0.92)', border: '2px solid #ff3300', color: '#fff3e0', fontSize: '1.3em', textShadow: '0 0 16px #ff3300' }}>
+                    <div className="notes">
                         <strong>"Doesn't matter how big the room, I cast fireball!"</strong>
                         <br/>
-                        The legendary FIREBALL cocktail burns again. The flames consume the darkness.
+                        The flames swirl in the darkness. You have invoked the forbidden fire.
                     </div>
-                    <button onClick={handleClose} style={{ background: 'linear-gradient(90deg, #ff3300 40%, #ffae42 100%)', color: '#fff', border: '2px solid #ffae42', fontSize: '1.3em', boxShadow: '0 0 20px #ff3300', marginTop: 32 }}>
-                        Close
+                    <button onClick={handleClose}>
+                        Close Grimoire
                     </button>
+                </div>
+            ) : discoveredSecret.name === 'Tralalero Tralala' ? (
+                <div className="brainrot-content sea-theme">
+                    {/* Vine boom sound - preload for better performance */}
+                    <audio id="vineBoom" preload="auto" autoPlay>
+                        <source src="https://www.myinstants.com/media/sounds/vine-boom.mp3" type="audio/mp3" />
+                    </audio>
+                    {/* Main video content */}
+                    <div className="video-container">
+                        <iframe
+                            width="800"
+                            height="315"
+                            src="https://www.youtube.com/embed/ssOLDdXDUjQ?autoplay=1&modestbranding=1&controls=0&loop=1&playlist=ssOLDdXDUjQ"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            title="Tralalero Video"
+                        ></iframe>
+                    </div>
+                    {/* Main content */}
+                    <div className="content-wrapper">
+                        <h2 className="brainrot-title">tralalero tralala</h2>
+                        {/* Recipe info */}
+                        <div className="recipe-container">
+                            <p className="recipe-name">{discoveredSecret.name}</p>
+                            <div className="recipe-notes">
+                                {discoveredSecret.notes}
+                            </div>
+                        </div>
+                        {/* Meme text */}
+                        <div className="brainrot-bonus">
+                            <span className="bonus-text">
+                                Porco Dio e porco Allah<br/>
+                                Ero con il mio fottuto figlio merdardo a giocare a Fortnite<br/>
+                                Quando a un punto arriva mia nonna<br/>
+                                Ornella Leccacappella
+                            </span>
+                            <span className="bonus-subtext">....god this generation is doomed</span>
+                        </div>
+                        {/* Close button */}
+                        <button 
+                            className="brainrot-button" 
+                            onClick={handleClose}
+                        >
+                            return to land
+                        </button>
+                    </div>
                 </div>
             ) : (
                 <div className="secret-discovery-content">

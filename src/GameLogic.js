@@ -166,6 +166,17 @@ export function evaluateDrink(mixGlass, mission, garnish = null, prepMethod = nu
     // Generate drink name first - this will also check if it's a known recipe
     const { name: drinkName, isKnownRecipe } = generateDrinkName(mixGlass, prepMethod, garnish);
 
+    // Check if this is a secret cocktail
+    const secretRecipe = cocktailRecipes.find(r => r.name === drinkName && r.tags?.includes('Secret'));
+    if (secretRecipe) {
+        // Always return points for secret cocktails
+        return {
+            points: 999,
+            drinkName,
+            isKnownRecipe: true
+        };
+    }
+
     // If there's no mission (shouldn't happen), but it's a known recipe, return the name
     if (!mission) {
         return { points: 0, drinkName, isKnownRecipe };

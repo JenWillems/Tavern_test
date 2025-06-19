@@ -84,14 +84,12 @@ export default function App() {
         setDrinksServed(prev => prev + 1);
         const matchedRecipe = cocktailRecipes.find(recipe => recipe.name === result.drinkName);
         if (matchedRecipe?.tags?.includes('Secret')) {
-            if (result.drinkName === 'FIREBALL') {
-                setLastDiscoveredSecret(result.drinkName);
-                setShowSecretPopup(true);
-            } else if (!discoveredSecrets.includes(result.drinkName)) {
+            // Always show popup for any secret cocktail
+            if (!discoveredSecrets.includes(result.drinkName)) {
                 setDiscoveredSecrets(prev => [...prev, result.drinkName]);
-                setLastDiscoveredSecret(result.drinkName);
-                setShowSecretPopup(true);
             }
+            setLastDiscoveredSecret(result.drinkName);
+            setShowSecretPopup(true);
         }
     }, [currentMission, upgrades.drinkIncome, discoveredSecrets]);
 

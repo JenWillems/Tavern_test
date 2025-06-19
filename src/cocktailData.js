@@ -195,7 +195,7 @@ export const cocktailRecipes = [
         ingredients: ['Firewater', 'Firewater', 'Firewater', 'Honey'],
         garnishes: CHILI_FLAKE,
         serving: POURED,
-        notes: "A true cocktail for the masochist. It hurts. You'll be ask for more.",
+        notes: "A true cocktail for the masochist. It hurts. You'll be asking for more.",
         tags: ['Secret'],
     },
     {
