@@ -240,7 +240,7 @@ function Bar({
                                         <div className="cocktail-details">
                                                 <p>{cocktail.description}</p>
                                                 <p>Ingredients: {cocktail.ingredients.join(', ')}</p>
-                                                <p>Garnish: {cocktail.garnish}</p>
+                                                <p>Garnish: {cocktail.garnishes ? cocktail.garnishes.join(', ') : 'None'}</p>
                                                 <p>Serving: {cocktail.serving}</p>
                                             </div>
                                         )}
