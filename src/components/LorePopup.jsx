@@ -10,45 +10,42 @@ import React from 'react';
 export default function LorePopup({ onClose }) {
     return (
         <div className="lore-popup-overlay">
-            <div className="lore-popup">
-                <h2>Welcome to The Tipsy Dragon!</h2>
-                
+            <div className="lore-popup" style={{ maxWidth: '800px', minWidth: '520px', width: '60vw' }}>
+                <h2>Welcome, Keeper of The Tipsy Dragon!</h2>
                 <div className="lore-content">
                     <p>
-                        You've inherited <strong>The Tipsy Dragon</strong>, a once-legendary tavern known 
-                        throughout the realm for its exotic drinks and warm atmosphere. However, the previous 
-                        owner left you with a massive debt of <strong>20,000 gold</strong> owed to the 
-                        Merchants Guild.
+                        <strong>The Tipsy Dragon</strong> was once the heart of the realm—a place of legends, secrets, and the finest drinks. Now, its fate is in your hands.
                     </p>
-                    
                     <p>
-                        You have <strong>30 days</strong> to save the tavern by paying off the debt. Each day, 
-                        you'll serve drinks to a variety of customers, from common folk to legendary heroes. 
-                        Mix ingredients carefully, add garnishes, and choose the right preparation method to 
-                        create the perfect drinks.
+                        The previous owner vanished, leaving you a <strong>debt of 20,000 gold</strong> to the Merchants Guild. You have <strong>30 days</strong> to pay it off—or lose the tavern forever.
                     </p>
-                    
-                    <p>
-                        But beware - the Merchants Guild charges <strong>1,000 gold per day</strong> in debt 
-                        maintenance fees. You'll need to earn more than that to make progress on your debt.
+                    <ul style={{ margin: '18px 0 0 0', paddingLeft: '20px', fontSize: '1.08em' }}>
+                        <li><strong>Mix:</strong> Combine up to four ingredients—Firewater, Berry, Herbal, Honey.</li>
+                        <li><strong>Garnish:</strong> Add Mint Leaf, Lemon Twist, Chili Flake, or Sugar Rim.</li>
+                        <li><strong>Prepare:</strong> Stirred, Shaken, or Poured—each changes the drink.</li>
+                        <li><strong>Serve:</strong> Match the order for gold. Miss, and you lose out.</li>
+                        <li><strong>Upgrade & Discover:</strong> Improve your tavern and find secret recipes for big rewards.</li>
+                    </ul>
+                    <p style={{ marginTop: '16px' }}>
+                        <strong>Beware:</strong> You still have to pay <strong>rent food and booze,</strong> so be careful how you spend your gold. Only the clever survive.
+                    </p>
+                    <p style={{ marginTop: '14px', fontStyle: 'italic', color: '#ffd700' }}>
+                        The fire is lit, the mugs are ready. Will you become a legend?
                     </p>
                 </div>
-
                 <div className="lore-goals">
-                    <h3>Your Goals</h3>
+                    <h3>Your Path to Glory</h3>
                     <ul>
-                        <li>Pay off the 20,000 gold debt within 30 days</li>
-                        <li>Earn money by serving drinks to customers</li>
-                        <li>Upgrade your tavern to increase profits</li>
-                        <li>Discover secret recipes for bonus rewards</li>
+                        <li>Pay off the 20,000 gold debt in 30 days</li>
+                        <li>Master mixology and serve every customer</li>
+                        <li>Upgrade, discover secrets, and earn your legend</li>
                     </ul>
                 </div>
-
                 <button 
                     className="button button-gold"
                     onClick={onClose}
                 >
-                    Start Serving!
+                    Begin Your Legend
                 </button>
             </div>
         </div>
