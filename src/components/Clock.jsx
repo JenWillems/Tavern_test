@@ -11,7 +11,7 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'rea
  * @param {number} props.totalDays - Total number of days in the game
  */
 const Clock = forwardRef(({ onDayEnd, extraTime = false, day, totalDays = 30 }, ref) => {
-    const BASE_TIME = 120; // 2 minutes base time
+    const BASE_TIME = 180; // 3 minutes base time
     const EXTRA_TIME = 60;  // 1 minute extra time with upgrade
     
     const [timeLeft, setTimeLeft] = useState(extraTime ? BASE_TIME + EXTRA_TIME : BASE_TIME);
@@ -54,10 +54,10 @@ const Clock = forwardRef(({ onDayEnd, extraTime = false, day, totalDays = 30 }, 
     const seconds = timeLeft % 60;
     
     // Calculate rotation angles for the hands
-    // For a 2-minute game (120 seconds):
-    // - Minute hand should make 1/30th of a full rotation (12 deg) per second
+    // For a 3-minute game (180 seconds):
+    // - Minute hand should make 1/180th of a full rotation (2 deg) per second
     // - Second hand should make 1/60th of a full rotation (6 deg) per second
-    const minuteRotation = ((120 - timeLeft) * (360 / 120)) % 360;
+    const minuteRotation = ((180 - timeLeft) * (360 / 180)) % 360;
     const secondRotation = ((60 - seconds) * 6) % 360;
 
     return (

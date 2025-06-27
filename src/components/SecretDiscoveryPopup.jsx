@@ -22,13 +22,51 @@ export default function SecretDiscoveryPopup({ discoveredSecret, onClose, resetM
 
     return (
         <div className="secret-discovery">
-            {discoveredSecret.name === 'Tralalero Tralala' ? (
+            {discoveredSecret.name === 'FIREBALL' ? (
+                <div className="secret-discovery-content fireball">
+                    <div className="runes">
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                    </div>
+                    <div className="fire-anim" />
+                    <h2>Secret Ritual: FIREBALL</h2>
+                    <div className="runes">
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                        <span className="rune" />
+                    </div>
+                    <div className="explosion-anim" />
+                    <div className="video-container" style={{ margin: '16px 0' }}>
+                        <iframe
+                            width="320"
+                            height="180"
+                            src="https://www.youtube.com/embed/WMDwy0D-1aA?autoplay=1"
+                            frameBorder="0"
+                            allow="autoplay; encrypted-media"
+                            allowFullScreen
+                            title="Fireball Secret Video"
+                        ></iframe>
+                    </div>
+                    <div className="notes">
+                        <strong>"Doesn't matter how big the room, I cast fireball!"</strong>
+                        <br/>
+                        The flames swirl in the darkness. You have invoked the forbidden fire.
+                    </div>
+                    <button onClick={handleClose}>
+                        Close Grimoire
+                    </button>
+                </div>
+            ) : discoveredSecret.name === 'Tralalero Tralala' ? (
                 <div className="brainrot-content sea-theme">
                     {/* Vine boom sound - preload for better performance */}
                     <audio id="vineBoom" preload="auto" autoPlay>
                         <source src="https://www.myinstants.com/media/sounds/vine-boom.mp3" type="audio/mp3" />
                     </audio>
-
                     {/* Main video content */}
                     <div className="video-container">
                         <iframe
@@ -41,27 +79,9 @@ export default function SecretDiscoveryPopup({ discoveredSecret, onClose, resetM
                             title="Tralalero Video"
                         ></iframe>
                     </div>
-
-                    {/* Optimized explosion GIFs - single GIF reused for better performance */}
-                    <div className="explosion-container" aria-hidden="true">
-                        <img 
-                            className="explosion explosion-1" 
-                            src="https://media.tenor.com/images/16787d100a9f4a8349687f6e00c594bb/tenor.gif" 
-                            alt="" 
-                            loading="eager"
-                        />
-                        <img 
-                            className="explosion explosion-2" 
-                            src="https://media.tenor.com/images/16787d100a9f4a8349687f6e00c594bb/tenor.gif" 
-                            alt="" 
-                            loading="eager"
-                        />
-                    </div>
-
                     {/* Main content */}
                     <div className="content-wrapper">
                         <h2 className="brainrot-title">tralalero tralala</h2>
-                        
                         {/* Recipe info */}
                         <div className="recipe-container">
                             <p className="recipe-name">{discoveredSecret.name}</p>
@@ -69,18 +89,16 @@ export default function SecretDiscoveryPopup({ discoveredSecret, onClose, resetM
                                 {discoveredSecret.notes}
                             </div>
                         </div>
-
                         {/* Meme text */}
                         <div className="brainrot-bonus">
                             <span className="bonus-text">
-                                Porco Dio e porco Allah
-                                Ero con il mio fottuto figlio merdardo a giocare a Fortnite
-                                Quando a un punto arriva mia nonna
+                                Porco Dio e porco Allah<br/>
+                                Ero con il mio fottuto figlio merdardo a giocare a Fortnite<br/>
+                                Quando a un punto arriva mia nonna<br/>
                                 Ornella Leccacappella
                             </span>
                             <span className="bonus-subtext">....god this generation is doomed</span>
                         </div>
-
                         {/* Close button */}
                         <button 
                             className="brainrot-button" 

@@ -24,7 +24,6 @@ body {
     background-size: cover, 200px 200px, cover;
     background-attachment: fixed;
     color: var(--paper);
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
     letter-spacing: -0.2px;
 }
 
@@ -60,11 +59,6 @@ body {
     text-align: center;
     color: var(--gold);
     font-size: 3.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9),
-                 -1px -1px 0 var(--gold-dark),
-                 1px -1px 0 var(--gold-dark),
-                 -1px 1px 0 var(--gold-dark),
-                 1px 1px 0 var(--gold-dark);
     margin-bottom: 30px;
     font-family: 'Goudy Bookletter 1911', serif;
     letter-spacing: 3px;
@@ -265,7 +259,6 @@ body {
     border-bottom: 1px solid rgba(166, 124, 82, 0.2);
     color: var(--paper);
     font-size: 1.1em;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
     position: relative;
     transform: rotate(-0.1deg);
 }
@@ -724,7 +717,6 @@ body {
 .mission-display p {
     color: var(--paper);
     opacity: 0.85;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
     line-height: 1.6;
     margin: 15px 0;
     position: relative;
@@ -1013,7 +1005,6 @@ body {
     text-align: center;
     margin-bottom: 25px;
     font-size: 1.8em;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 .progress-book-view h3 {
@@ -1035,7 +1026,6 @@ body {
     text-align: center;
     margin: 20px 0;
     font-family: 'IM Fell English', serif;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 .upgrade-list {
@@ -1123,53 +1113,46 @@ body {
 .lore-popup {
     background: var(--panel-bg);
     border: 3px solid var(--gold);
-    padding: 40px;
-    max-width: 700px;
+    padding: 28px 48px 28px 48px;
+    max-width: 650px;
+    min-width: 420px;
+    width: 48vw;
     margin: 20px;
     position: relative;
     color: var(--paper);
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.7),
                 inset 0 0 30px rgba(212, 175, 55, 0.2);
     transform: rotate(-0.3deg);
-}
-
-.lore-popup::before {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    right: 5px;
-    bottom: 5px;
-    border: 1px solid var(--gold-dark);
-    pointer-events: none;
+    font-family: 'IM Fell English', 'Cinzel Decorative', 'Uncial Antiqua', serif;
+    text-align: left;
 }
 
 .lore-popup h2 {
     color: var(--gold);
     text-align: center;
-    font-family: 'Goudy Bookletter 1911', serif;
-    font-size: 2.5em;
-    margin-bottom: 30px;
+    font-family: 'Cinzel Decorative', 'Uncial Antiqua', serif;
+    font-size: 2.1em;
+    margin-bottom: 22px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     letter-spacing: 2px;
 }
 
-.lore-content {
-    font-family: 'IM Fell English', serif;
-    font-size: 1.2em;
-    line-height: 1.6;
-    text-align: justify;
-    margin-bottom: 30px;
+.lore-content,
+.lore-content p,
+.lore-content ul,
+.lore-content li,
+.lore-goals,
+.lore-goals h3,
+.lore-goals ul,
+.lore-goals li {
+    font-family: 'IM Fell English', 'Cinzel Decorative', 'Uncial Antiqua', serif;
+    font-size: 1.08em;
+    text-align: left;
 }
 
-.lore-content p {
-    margin-bottom: 20px;
-    transform: rotate(0.2deg);
-}
-
-.lore-content strong {
-    color: var(--gold-light);
-    font-weight: bold;
+.lore-content ul {
+    margin-left: 1.2em;
+    margin-bottom: 0.5em;
 }
 
 .lore-goals {
@@ -1177,17 +1160,18 @@ body {
         rgba(37, 24, 17, 0.7),
         rgba(37, 24, 17, 0.6)
     );
-    padding: 20px;
-    margin: 30px 0;
+    padding: 16px 20px;
+    margin: 24px 0 0 0;
     border: none;
     outline: 1px solid rgba(166, 124, 82, 0.3);
+    border-radius: 10px;
 }
 
 .lore-goals h3 {
     color: var(--gold);
-    font-family: 'Cinzel Decorative', cursive;
-    margin-bottom: 15px;
-    font-size: 1.4em;
+    font-family: 'Cinzel Decorative', 'Uncial Antiqua', serif;
+    margin-bottom: 10px;
+    font-size: 1.2em;
     text-align: center;
 }
 
@@ -1197,9 +1181,10 @@ body {
 }
 
 .lore-goals li {
-    margin: 10px 0;
-    padding-left: 25px;
+    margin: 8px 0;
+    padding-left: 22px;
     position: relative;
+    font-size: 1em;
 }
 
 .lore-goals li::before {
@@ -1216,14 +1201,15 @@ body {
         var(--gold-dark)
     );
     color: var(--paper);
-    font-size: 1.3em;
-    padding: 15px 30px;
+    font-size: 1.1em;
+    padding: 12px 24px;
     width: 100%;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-top: 20px;
+    margin-top: 18px;
     transition: all 0.3s ease;
+    font-family: 'Cinzel Decorative', 'Uncial Antiqua', serif;
 }
 
 .button-gold:hover {
