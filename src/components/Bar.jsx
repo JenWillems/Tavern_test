@@ -120,18 +120,9 @@ function Bar({
     };
 
     const toggleFilter = (filter) => {
-        setSelectedFilters(prev => {
-            // If the filter is Herbal, also check for Bitter and vice versa
-            const oppositeFilter = filter === 'Herbal' ? 'Bitter' : filter === 'Bitter' ? 'Herbal' : null;
-            
-            if (prev.includes(filter)) {
-                // Remove both filters if either is present
-                return prev.filter(f => f !== filter && f !== oppositeFilter);
-            } else {
-                // Add both filters
-                return [...prev, filter, oppositeFilter].filter((value, index, self) => self.indexOf(value) === index);
-            }
-        });
+        setSelectedFilters(prev => 
+            prev.includes(filter) ? prev.filter(f => f !== filter) : [...prev, filter]
+        );
     };
 
     const handleDumpDrink = () => {
@@ -210,23 +201,23 @@ function Bar({
                                     <img src="src/assets/Tags/Sweet-tag.png" alt="Sweet" />
                                 </button>
                                 <button
-                                    className={`filter-button ${selectedFilters.includes('Herbal') || selectedFilters.includes('Bitter') ? 'active' : ''}`}
+                                    className={`filter-button ${selectedFilters.includes('Herbal') ? 'active' : ''}`}
                                     onClick={() => toggleFilter('Herbal')}
                                 >
                                     <img src="src/assets/Tags/herbal-tag.png" alt="Herbal" />
                                 </button>
-                                <button
+                                    <button
                                     className={`filter-button ${selectedFilters.includes('Strong') ? 'active' : ''}`}
                                     onClick={() => toggleFilter('Strong')}
-                                >
+                                    >
                                     <img src="src/assets/Tags/Strong-tag.png" alt="Strong" />
-                                </button>
-                                <button
+                                    </button>
+                                    <button
                                     className={`filter-button ${selectedFilters.includes('Sour') ? 'active' : ''}`}
                                     onClick={() => toggleFilter('Sour')}
-                                >
+                                    >
                                     <img src="src/assets/Tags/Sour-tag.png" alt="Sour" />
-                                </button>
+                                    </button>
                             </div>
                             <div className="cocktail-list">
                                 {filteredCocktails.map((cocktail) => (
@@ -351,27 +342,31 @@ function Bar({
                     <button
                         className={`garnish-button ${selectedGarnish?.name === 'Mint Leaf' ? 'selected' : ''}`}
                         onClick={() => handleGarnishClick('Mint Leaf')}
+                        disabled={selectedIngredients.length >= 4}
                     >
                         <img src={mintLeaf} alt="Mint Leaf" className="mint-leaf" />
                     </button>
                     <button
                         className={`garnish-button ${selectedGarnish?.name === 'Lemon Twist' ? 'selected' : ''}`}
                         onClick={() => handleGarnishClick('Lemon Twist')}
+                        disabled={selectedIngredients.length >= 4}
                     >
                         <img src={lemon} alt="Lemon Twist" className="lemon-twist" />
                     </button>
                     <button
                         className={`garnish-button ${selectedGarnish?.name === 'Chili Flake' ? 'selected' : ''}`}
                         onClick={() => handleGarnishClick('Chili Flake')}
+                        disabled={selectedIngredients.length >= 4}
                     >
                         <img src={chiliFlakes} alt="Chili Flake" className="chili-flakes" />
                     </button>
-                    <button
+                        <button
                         className={`garnish-button ${selectedGarnish?.name === 'Sugar Rim' ? 'selected' : ''}`}
                         onClick={() => handleGarnishClick('Sugar Rim')}
-                    >
+                        disabled={selectedIngredients.length >= 4}
+                        >
                         <img src={sugar} alt="Sugar Rim" className="sugar-rim" />
-                    </button>
+                        </button>
                 </div>
             </div>
 
@@ -381,11 +376,11 @@ function Bar({
                 <div className="selected-ingredients">
                     <h2 className="ingredients-title">Ingredients:</h2>
                     <div className="ingredients-grid">
-                    {selectedIngredients.map((ingredient, index) => (
+                        {selectedIngredients.map((ingredient, index) => (
                             <div key={index} className="ingredient-item">
                                 {ingredient.name}
-                        </div>
-                    ))}
+                            </div>
+                        ))}
                     </div>
                     {selectedGarnish && (
                         <div className="garnish-item">
@@ -397,7 +392,7 @@ function Bar({
                 {/* Bottom Controls */}
                 <div className="bottom-controls">
                     {/* Serving Options */}
-                <div className="serving-options">
+                    <div className="serving-options">
                         <button
                             className={`serving-option ${selectedServing === 'Stirred' ? 'selected' : ''}`}
                             onClick={() => handleServingClick('Stirred')}
@@ -431,27 +426,33 @@ function Bar({
                                 className="serving-icon" 
                             />
                         </button>
-                </div>
+                    </div>
 
                     {/* Action Buttons */}
-                <div className="action-buttons">
-                    <button
-                        className="serve-button tag-button"
-                        onClick={handleServe}
-                        disabled={!canServe}
-                    >
-                        <span className="tag-hole"></span>
-                        <span className="tag-text">Serve your drink</span>
-                    </button>
-                    <button
-                        className="dump-button tag-button"
-                        onClick={handleDumpDrink}
-                        disabled={selectedIngredients.length === 0 || dumpDrinkUses <= 0}
-                    >
-                        <span className="tag-hole"></span>
-                        <span className="tag-text">Trash it</span>
-                    </button>
-                </div>
+                    <div className="action-buttons">
+                        <button
+                            className="serve-button"
+                            onClick={handleServe}
+                            disabled={!canServe}
+                        >
+                            <img 
+                                src={serveDrink}
+                                alt="Serve your drink" 
+                                className="action-icon" 
+                            />
+                        </button>
+                        <button
+                            className="dump-button"
+                            onClick={handleDumpDrink}
+                            disabled={selectedIngredients.length === 0 || dumpDrinkUses <= 0}
+                        >
+                            <img 
+                                src={trashDrink}
+                                alt="Trash it" 
+                                className="action-icon" 
+                            />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
